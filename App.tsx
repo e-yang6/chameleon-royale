@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Player, GameState } from './types';
+import { Player, GameState, Card } from './types';
 import { generateGameBoard } from './services/geminiService';
 import { Button } from './components/Button';
 import { CardGrid } from './components/CardGrid';
