@@ -1,0 +1,9 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/clashroyale/:path*",
+      "destination": "/api/proxy/:path*"
+    }
+  ]
+}
+

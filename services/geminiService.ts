@@ -2,7 +2,8 @@ import { Card } from "../types";
 
 // Clash Royale API configuration
 const API_BASE_URL = "https://api.clashroyale.com/v1";
-const API_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6ImZhNWI2YjE2LTRhZjctNGUyZi1iNDRkLTdhZDk3MzA4YmRiYSIsImlhdCI6MTc2Njg5OTU3Miwic3ViIjoiZGV2ZWxvcGVyLzA3ZGI0YjljLWEzYjQtMTMzNS1kYWNiLTc2MWRlYjg5OTU3YiIsInNjb3BlcyI6WyJyb3lhbGUiXSwibGltaXRzIjpbeyJ0aWVyIjoiZGV2ZWxvcGVyL3NpbHZlciIsInR5cGUiOiJ0aHJvdHRsaW5nIn0seyJjaWRycyI6WyI5OS4yMjkuNjEuNzUiXSwidHlwZSI6ImNsaWVudCJ9XX0.dQHcW_uPrOFekhW9272ICRpX7UUTKYO2DYA29zbi2td_gUbFSbDL9aAsqp6HS3kupz9ZbIub0vLcRQZKa-L_WQ";
+// Note: In development, we use a proxy (configured in vite.config.ts) which adds the auth token server-side
+// The token should NOT be exposed in client-side code for security
 
 // API response types - structure may vary, we'll handle flexibility
 interface ApiCard {
@@ -78,21 +79,17 @@ const shuffleAndSelect = <T>(array: T[], count: number): T[] => {
 
 export const generateGameBoard = async (): Promise<Card[]> => {
   try {
-    // Use proxy in development (Vite dev server), direct API in production
-    // In dev, use relative path which will be proxied by Vite
-    const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const apiUrl = isDev 
-      ? '/api/clashroyale/cards' 
-      : `${API_BASE_URL}/cards`;
+    // Always use proxy route - configure proxy in your deployment platform
+    // For Vite dev: configured in vite.config.ts
+    // For production: use Vercel rewrites, Netlify redirects, or similar
+    const apiUrl = '/api/clashroyale/cards';
     
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
     
-    // Only add auth header if not using proxy (proxy adds it server-side)
-    if (!isDev) {
-      headers['Authorization'] = `Bearer ${API_TOKEN}`;
-    }
+    // Proxy adds auth header server-side
+    // Never expose API tokens in client-side code!
     
     const response = await fetch(apiUrl, {
       method: 'GET',
