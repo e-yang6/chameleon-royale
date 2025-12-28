@@ -113,6 +113,24 @@ This is the **most important step**:
 3. Vercel function logs for errors
 4. Make sure the API token is valid and not expired
 
+### Getting 403 "Invalid authorization: API key does not allow access from IP" error
+
+**This is an IP restriction issue:**
+
+Vercel serverless functions use **dynamic IP addresses** that change with each deployment. The Clash Royale API key has IP restrictions enabled, which blocks requests from Vercel's IPs.
+
+**Solution:**
+1. Go to [Clash Royale Developer Portal](https://developer.clashroyale.com)
+2. Log in and go to your API key settings
+3. **Remove IP restrictions** or set it to allow access from **any IP address** (0.0.0.0/0)
+4. Save the changes
+5. Redeploy your Vercel function
+
+**Note:** Removing IP restrictions is safe because:
+- Your API token is stored securely in Vercel environment variables
+- The token is never exposed to the client
+- The API is only called from your serverless function, not directly from the browser
+
 ## File Structure
 
 Your project should look like this:

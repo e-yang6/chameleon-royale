@@ -98,20 +98,32 @@ export const generateGameBoard = async (): Promise<Card[]> => {
 
     if (!response.ok) {
       // Try to get error details from response
-      let errorDetails = '';
+      let errorData: any = null;
       try {
-        const errorData = await response.json();
-        errorDetails = JSON.stringify(errorData);
+        errorData = await response.json();
       } catch {
-        errorDetails = await response.text();
+        const text = await response.text();
+        errorData = { message: text };
       }
+      
       console.error('API Error Response:', {
         status: response.status,
         statusText: response.statusText,
         url: apiUrl,
-        details: errorDetails,
+        details: errorData,
       });
-      throw new Error(`API request failed: ${response.status} ${response.statusText}${errorDetails ? ` - ${errorDetails}` : ''}`);
+      
+      // Check for IP restriction error
+      if (response.status === 403 && errorData?.reason === 'accessDenied.invalidIp') {
+        throw new Error(
+          'IP Restriction Error: Your Clash Royale API key has IP restrictions enabled. ' +
+          'Vercel serverless functions use dynamic IP addresses that cannot be whitelisted. ' +
+          'Please go to https://developer.clashroyale.com and remove IP restrictions from your API key, ' +
+          'or set it to allow access from any IP address.'
+        );
+      }
+      
+      throw new Error(`API request failed: ${response.status} ${response.statusText}${errorData?.message ? ` - ${errorData.message}` : ''}`);
     }
 
     const data: ApiResponse = await response.json();
@@ -142,36 +154,36 @@ export const generateGameBoard = async (): Promise<Card[]> => {
     console.error("Failed to fetch cards from Clash Royale API:", error);
     console.error("Error details:", error);
     
-    // Fallback: Use Merge Tactics cards with actual Clash Royale elixir costs
+    // Fallback: Use Clash Royale cards with accurate stats
     const fallbackCardNames = [
       "Archer Queen", "Bandit", "Barbarians", "Dart Goblin", "Electro Giant",
-      "Elixir Collector", "Executioner", "Goblin", "Goblin Machine", "Golden Knight",
+      "Elixir Collector", "Executioner", "Goblins", "Goblin Machine", "Golden Knight",
       "Inferno Tower", "Mega Knight", "Mini P.E.K.K.A", "Monk", "Mortar",
       "Musketeer", "P.E.K.K.A", "Prince", "Princess", "Royal Ghost",
-      "Royal Giant", "Skeleton", "Skeleton Dragon", "Skeleton King", "Spear Goblin",
+      "Royal Giant", "Skeletons", "Skeleton Dragons", "Skeleton King", "Spear Goblins",
       "Tesla", "Valkyrie", "Witch", "Wizard", "X-Bow"
     ];
     
     const fallbackRarities: Record<string, Card['rarity']> = {
       "Archer Queen": "Champion", "Bandit": "Legendary", "Barbarians": "Common",
       "Dart Goblin": "Rare", "Electro Giant": "Legendary", "Elixir Collector": "Common",
-      "Executioner": "Epic", "Goblin": "Common", "Goblin Machine": "Epic",
+      "Executioner": "Epic", "Goblins": "Common", "Goblin Machine": "Legendary",
       "Golden Knight": "Champion", "Inferno Tower": "Rare", "Mega Knight": "Legendary",
       "Mini P.E.K.K.A": "Rare", "Monk": "Champion", "Mortar": "Common",
       "Musketeer": "Rare", "P.E.K.K.A": "Epic", "Prince": "Epic",
       "Princess": "Legendary", "Royal Ghost": "Legendary", "Royal Giant": "Common",
-      "Skeleton": "Common", "Skeleton Dragon": "Rare", "Skeleton King": "Champion",
-      "Spear Goblin": "Common", "Tesla": "Common", "Valkyrie": "Rare",
+      "Skeletons": "Common", "Skeleton Dragons": "Epic", "Skeleton King": "Champion",
+      "Spear Goblins": "Common", "Tesla": "Common", "Valkyrie": "Rare",
       "Witch": "Epic", "Wizard": "Rare", "X-Bow": "Epic"
     };
     
     const fallbackElixirs: Record<string, number> = {
       "Archer Queen": 5, "Bandit": 3, "Barbarians": 5, "Dart Goblin": 3,
-      "Electro Giant": 7, "Elixir Collector": 6, "Executioner": 5, "Goblin": 1,
-      "Goblin Machine": 4, "Golden Knight": 5, "Inferno Tower": 5, "Mega Knight": 7,
+      "Electro Giant": 7, "Elixir Collector": 6, "Executioner": 5, "Goblins": 2,
+      "Goblin Machine": 5, "Golden Knight": 5, "Inferno Tower": 5, "Mega Knight": 7,
       "Mini P.E.K.K.A": 4, "Monk": 5, "Mortar": 4, "Musketeer": 4, "P.E.K.K.A": 7,
-      "Prince": 5, "Princess": 3, "Royal Ghost": 3, "Royal Giant": 6, "Skeleton": 1,
-      "Skeleton Dragon": 4, "Skeleton King": 5, "Spear Goblin": 2, "Tesla": 4,
+      "Prince": 5, "Princess": 3, "Royal Ghost": 3, "Royal Giant": 6, "Skeletons": 1,
+      "Skeleton Dragons": 4, "Skeleton King": 5, "Spear Goblins": 2, "Tesla": 4,
       "Valkyrie": 4, "Witch": 5, "Wizard": 5, "X-Bow": 6
     };
     
