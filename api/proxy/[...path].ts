@@ -1,7 +1,12 @@
 // Vercel serverless function to proxy Clash Royale API requests
 // This keeps the API token secure on the server
 
-export default async function handler(req: any, res: any) {
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+
+export default async function handler(
+  req: VercelRequest,
+  res: VercelResponse
+) {
   const { path } = req.query;
   const pathString = Array.isArray(path) ? path.join('/') : path || '';
   
@@ -12,7 +17,9 @@ export default async function handler(req: any, res: any) {
   }
   
   try {
-    const apiUrl = `https://api.clashroyale.com/v1/${pathString}`;
+    // Construct URL using WHATWG URL API to avoid deprecation warnings
+    const baseUrl = new URL('https://api.clashroyale.com/v1');
+    const apiUrl = new URL(pathString, baseUrl).href;
     
     const response = await fetch(apiUrl, {
       method: req.method || 'GET',
@@ -24,10 +31,10 @@ export default async function handler(req: any, res: any) {
     
     const data = await response.json();
     
-    res.status(response.status).json(data);
+    return res.status(response.status).json(data);
   } catch (error) {
     console.error('Proxy error:', error);
-    res.status(500).json({ error: 'Failed to fetch from API' });
+    return res.status(500).json({ error: 'Failed to fetch from API' });
   }
 }
 

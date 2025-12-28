@@ -1,4 +1,9 @@
 {
+  "functions": {
+    "api/proxy/[...path].ts": {
+      "runtime": "nodejs22.x"
+    }
+  },
   "rewrites": [
     {
       "source": "/api/clashroyale/:path*",
@@ -6,4 +11,5 @@
     }
   ]
 }
+
 
