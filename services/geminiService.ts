@@ -97,7 +97,21 @@ export const generateGameBoard = async (): Promise<Card[]> => {
     });
 
     if (!response.ok) {
-      throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+      // Try to get error details from response
+      let errorDetails = '';
+      try {
+        const errorData = await response.json();
+        errorDetails = JSON.stringify(errorData);
+      } catch {
+        errorDetails = await response.text();
+      }
+      console.error('API Error Response:', {
+        status: response.status,
+        statusText: response.statusText,
+        url: apiUrl,
+        details: errorDetails,
+      });
+      throw new Error(`API request failed: ${response.status} ${response.statusText}${errorDetails ? ` - ${errorDetails}` : ''}`);
     }
 
     const data: ApiResponse = await response.json();
