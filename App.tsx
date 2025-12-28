@@ -3,9 +3,7 @@ import { Player, GameState } from './types';
 import { generateGameBoard } from './services/geminiService';
 import { Button } from './components/Button';
 import { CardGrid } from './components/CardGrid';
-import { Trophy, Users, Eye, EyeOff, Play, Info, RotateCcw, UserPlus } from 'lucide-react';
-
-const CATEGORIES = ["Mix", "Win Conditions", "Spells", "Swarms", "Tanks", "Air Troops"];
+import { Trophy, Users, Eye, EyeOff, Play, Info, RotateCcw, UserPlus, Crown } from 'lucide-react';
 
 function App() {
   const [gameState, setGameState] = useState<GameState>({
@@ -19,9 +17,10 @@ function App() {
   });
 
   const [playerName, setPlayerName] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('Mix');
   const [showRules, setShowRules] = useState(false);
   const [winner, setWinner] = useState<'Citizens' | 'Chameleon' | null>(null);
+  const [gameMode, setGameMode] = useState<'classic' | 'impostor'>('classic');
+  const [hideBoard, setHideBoard] = useState(false);
 
   // --- Actions ---
 
@@ -55,7 +54,7 @@ function App() {
 
     setGameState(prev => ({ ...prev, phase: 'LOADING_BOARD' }));
 
-    const cards = await generateGameBoard(selectedCategory);
+    const cards = await generateGameBoard();
     const secret = cards[Math.floor(Math.random() * cards.length)];
     
     // Assign Chameleon
@@ -67,6 +66,13 @@ function App() {
       isChameleon: idx === chameleonIndex
     }));
 
+    // In impostor mode, give chameleon a different card from the board
+    let chameleonCard: Card | null = null;
+    if (gameMode === 'impostor') {
+      const nonSecretCards = cards.filter(c => c.name !== secret.name);
+      chameleonCard = nonSecretCards[Math.floor(Math.random() * nonSecretCards.length)];
+    }
+
     // Determine starter
     const starter = updatedPlayers[Math.floor(Math.random() * updatedPlayers.length)];
 
@@ -75,6 +81,9 @@ function App() {
       players: updatedPlayers,
       boardCards: cards,
       secretCard: secret,
+      chameleonCard: chameleonCard,
+      gameMode: gameMode,
+      hideBoard: hideBoard,
       currentPlayerIndex: 0,
       phase: 'REVEAL_INTERSTITIAL',
       starterPlayerId: starter.id
@@ -108,6 +117,7 @@ function App() {
       phase: 'SETUP',
       boardCards: [],
       secretCard: null,
+      chameleonCard: null,
       currentPlayerIndex: 0,
       winner: null
     }));
@@ -123,12 +133,11 @@ function App() {
 
   const renderSetup = () => (
     <div className="flex flex-col items-center justify-center min-h-screen p-6 max-w-lg mx-auto w-full">
-      <div className="w-full space-y-12">
+      <div className="w-full space-y-8">
         <div className="text-center space-y-3">
-          <h1 className="text-4xl md:text-5xl text-white brand-font tracking-wide">
-            Clash Chameleon
+          <h1 className="text-4xl md:text-5xl text-white font-bold tracking-wide">
+            Chameleon Royale
           </h1>
-          <p className="text-zinc-500 font-light">Social deduction in the Arena</p>
         </div>
 
         <div className="space-y-6">
@@ -161,27 +170,57 @@ function App() {
             </div>
           </div>
 
-          <div className="space-y-3">
-            <h2 className="text-xs uppercase tracking-widest text-zinc-500 font-semibold">Deck Category</h2>
-            <div className="flex flex-wrap gap-2">
-              {CATEGORIES.map(cat => (
-                <button
-                  key={cat}
-                  onClick={() => setSelectedCategory(cat)}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium border transition-all ${
-                    selectedCategory === cat 
-                      ? 'bg-zinc-100 border-zinc-100 text-black' 
-                      : 'bg-transparent border-zinc-800 text-zinc-400 hover:border-zinc-600 hover:text-zinc-300'
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
+          <div className="space-y-4">
+            <h2 className="text-xs uppercase tracking-widest text-zinc-500 font-semibold">Game Mode</h2>
+            <div className="flex flex-col gap-2">
+              <label className="flex items-center gap-3 p-3 rounded-lg border border-zinc-800 bg-zinc-900/50 cursor-pointer hover:bg-zinc-900 transition-colors">
+                <input
+                  type="radio"
+                  name="gameMode"
+                  value="classic"
+                  checked={gameMode === 'classic'}
+                  onChange={(e) => setGameMode(e.target.value as 'classic' | 'impostor')}
+                  className="w-4 h-4 text-white bg-zinc-800 border-zinc-600 focus:ring-2 focus:ring-white"
+                />
+                <div className="flex-1">
+                  <div className="text-sm font-medium text-white">Classic</div>
+                  <div className="text-xs text-zinc-500">Chameleon knows they're the impostor</div>
+                </div>
+              </label>
+              <label className="flex items-center gap-3 p-3 rounded-lg border border-zinc-800 bg-zinc-900/50 cursor-pointer hover:bg-zinc-900 transition-colors">
+                <input
+                  type="radio"
+                  name="gameMode"
+                  value="impostor"
+                  checked={gameMode === 'impostor'}
+                  onChange={(e) => setGameMode(e.target.value as 'classic' | 'impostor')}
+                  className="w-4 h-4 text-white bg-zinc-800 border-zinc-600 focus:ring-2 focus:ring-white"
+                />
+                <div className="flex-1">
+                  <div className="text-sm font-medium text-white">Impostor</div>
+                  <div className="text-xs text-zinc-500">Impostor gets a fake card and doesn't know</div>
+                </div>
+              </label>
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="flex items-center gap-3 p-3 rounded-lg border border-zinc-800 bg-zinc-900/50 cursor-pointer hover:bg-zinc-900 transition-colors">
+              <input
+                type="checkbox"
+                checked={hideBoard}
+                onChange={(e) => setHideBoard(e.target.checked)}
+                className="w-4 h-4 text-white bg-zinc-800 border-zinc-600 rounded focus:ring-2 focus:ring-white"
+              />
+              <div className="flex-1">
+                <div className="text-sm font-medium text-white">Hide Board</div>
+                <div className="text-xs text-zinc-500">Hide card grid during gameplay</div>
+              </div>
+            </label>
           </div>
         </div>
 
-        <div className="pt-4 flex flex-col gap-4">
+        <div className="flex flex-col gap-4">
           <Button 
             variant="primary" 
             size="lg" 
@@ -233,14 +272,21 @@ function App() {
   const renderRevealInfo = () => {
     const player = gameState.players[gameState.currentPlayerIndex];
     const isChameleon = player.isChameleon;
+    const isImpostorMode = gameState.gameMode === 'impostor';
+    
+    // In impostor mode, chameleon sees a fake card and doesn't know they're the chameleon
+    const cardToShow = isChameleon && isImpostorMode && gameState.chameleonCard 
+      ? gameState.chameleonCard 
+      : gameState.secretCard;
+    const showAsChameleon = isChameleon && !isImpostorMode; // Only show chameleon status in classic mode
 
     return (
       <div className="flex flex-col items-center justify-center h-screen p-6 bg-zinc-950">
-        <div className={`max-w-md w-full text-center p-10 rounded-2xl border transition-colors duration-500 ${isChameleon ? 'border-red-900/50 bg-red-950/10' : 'border-emerald-900/50 bg-emerald-950/10'}`}>
+        <div className={`max-w-md w-full text-center p-10 rounded-2xl border transition-colors duration-500 ${showAsChameleon ? 'border-red-900/50 bg-red-950/10' : 'border-emerald-900/50 bg-emerald-950/10'}`}>
           
           <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-8">Your Identity</h2>
           
-          {isChameleon ? (
+          {showAsChameleon ? (
             <div className="mb-12 space-y-4">
               <div className="text-6xl">🦎</div>
               <h1 className="text-3xl font-bold text-red-500">Chameleon</h1>
@@ -251,8 +297,19 @@ function App() {
               <div className="text-6xl">🛡️</div>
               <h1 className="text-3xl font-bold text-emerald-500">Citizen</h1>
               <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl">
-                <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-2">Secret Card</p>
-                <p className="text-2xl font-bold text-white">{gameState.secretCard?.name}</p>
+                <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-4">Secret Card</p>
+                {cardToShow?.imageUrl && (
+                  <img 
+                    src={cardToShow.imageUrl} 
+                    alt={cardToShow.name}
+                    className="w-32 h-40 object-contain mx-auto mb-4"
+                    onError={(e) => {
+                      // Hide image on error
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                )}
+                <p className="text-2xl font-bold text-white">{cardToShow?.name}</p>
               </div>
             </div>
           )}
@@ -273,7 +330,7 @@ function App() {
         <div className="flex-none px-6 py-4 border-b border-zinc-900 flex justify-between items-center z-10 bg-zinc-950/80 backdrop-blur-sm">
              <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-full bg-zinc-900 flex items-center justify-center text-yellow-500">
-                    <Play size={14} fill="currentColor" />
+                    <Crown size={16} fill="currentColor" />
                 </div>
                 <div className="flex flex-col">
                     <span className="text-[10px] text-zinc-500 uppercase tracking-wider">First Turn</span>
@@ -286,13 +343,18 @@ function App() {
             </Button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6">
-           <CardGrid cards={gameState.boardCards} />
-        </div>
-
-        <div className="flex-none p-4 text-center text-xs text-zinc-500 border-t border-zinc-900 bg-zinc-950">
-            Give a one-word hint. Don't be too obvious, don't be too vague.
-        </div>
+        {gameState.hideBoard ? (
+          <div className="flex-1 flex items-center justify-center p-6">
+            <div className="text-center space-y-4">
+              <p className="text-zinc-500 text-lg">Board is hidden</p>
+              <p className="text-zinc-600 text-sm">Discuss and give hints without seeing the cards</p>
+            </div>
+          </div>
+        ) : (
+          <div className="flex-1 overflow-y-auto p-6">
+            <CardGrid cards={gameState.boardCards} />
+          </div>
+        )}
       </div>
     );
   };
@@ -343,9 +405,20 @@ function App() {
             </div>
 
             <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 max-w-sm mx-auto">
-                <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-2">Secret Card</p>
+                <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-4">Secret Card</p>
                 {gameState.secretCard && (
-                    <div>
+                    <div className="flex flex-col items-center">
+                        {gameState.secretCard.imageUrl && (
+                          <img 
+                            src={gameState.secretCard.imageUrl} 
+                            alt={gameState.secretCard.name}
+                            className="w-32 h-40 object-contain mb-4"
+                            onError={(e) => {
+                              // Hide image on error
+                              (e.target as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+                        )}
                         <h2 className="text-2xl font-bold text-white mb-1">{gameState.secretCard.name}</h2>
                         <span className="text-xs text-zinc-500">{gameState.secretCard.rarity}</span>
                     </div>

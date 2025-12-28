@@ -45,9 +45,8 @@ export const CardGrid: React.FC<CardGridProps> = ({ cards, secretCard, revealSec
             {/* Rarity Line Indicator at bottom */}
             <div className={`absolute bottom-0 left-0 right-0 h-1 ${getRarityColor(card.rarity)} opacity-50 group-hover:opacity-100 transition-opacity`}></div>
 
-            <div className="p-4 flex flex-col h-full justify-between">
-              
-              <div className="flex justify-between items-start mb-2">
+            <div className="p-4 flex flex-col h-full min-h-[120px] relative">
+              <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
                  {/* Coordinate */}
                 <span className="text-[10px] font-mono text-zinc-600 uppercase tracking-widest">
                   {String.fromCharCode(65 + Math.floor(idx / 4))}{ (idx % 4) + 1 }
@@ -59,13 +58,9 @@ export const CardGrid: React.FC<CardGridProps> = ({ cards, secretCard, revealSec
                 </span>
               </div>
 
-              <div className="text-center mb-4">
+              <div className="flex-1 flex flex-col justify-center items-center text-center">
                 <h3 className="font-semibold text-zinc-100 text-sm md:text-base leading-tight">{card.name}</h3>
                 <p className={`text-[10px] uppercase tracking-wider mt-1 font-medium ${getRarityText(card.rarity)} opacity-70`}>{card.rarity}</p>
-              </div>
-              
-              <div className="text-[10px] text-zinc-500 text-center leading-relaxed">
-                {card.description}
               </div>
             </div>
           </div>

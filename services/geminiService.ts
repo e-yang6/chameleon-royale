@@ -1,76 +1,177 @@
-import { GoogleGenAI, Type } from "@google/genai";
 import { Card } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+// Clash Royale API configuration
+const API_BASE_URL = "https://api.clashroyale.com/v1";
+const API_TOKEN = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiIsImtpZCI6IjI4YTMxOGY3LTAwMDAtYTFlYi03ZmExLTJjNzQzM2M2Y2NhNSJ9.eyJpc3MiOiJzdXBlcmNlbGwiLCJhdWQiOiJzdXBlcmNlbGw6Z2FtZWFwaSIsImp0aSI6ImZhNWI2YjE2LTRhZjctNGUyZi1iNDRkLTdhZDk3MzA4YmRiYSIsImlhdCI6MTc2Njg5OTU3Miwic3ViIjoiZGV2ZWxvcGVyLzA3ZGI0YjljLWEzYjQtMTMzNS1kYWNiLTc2MWRlYjg5OTU3YiIsInNjb3BlcyI6WyJyb3lhbGUiXSwibGltaXRzIjpbeyJ0aWVyIjoiZGV2ZWxvcGVyL3NpbHZlciIsInR5cGUiOiJ0aHJvdHRsaW5nIn0seyJjaWRycyI6WyI5OS4yMjkuNjEuNzUiXSwidHlwZSI6ImNsaWVudCJ9XX0.dQHcW_uPrOFekhW9272ICRpX7UUTKYO2DYA29zbi2td_gUbFSbDL9aAsqp6HS3kupz9ZbIub0vLcRQZKa-L_WQ";
 
-export const generateGameBoard = async (category: string = "Mix"): Promise<Card[]> => {
+// API response types - structure may vary, we'll handle flexibility
+interface ApiCard {
+  name: string;
+  id?: number;
+  maxLevel?: number;
+  iconUrls?: {
+    medium: string;
+  };
+  rarity?: string;
+  rarityName?: string;
+  elixir?: number;
+  elixirCost?: number;
+  elixirElixir?: number;
+}
+
+interface ApiResponse {
+  items: ApiCard[];
+  supportItems?: ApiCard[];
+}
+
+// Map API rarity to our Card rarity type
+const mapRarity = (apiRarity?: string): Card['rarity'] => {
+  if (!apiRarity) return 'Common';
+  const rarityMap: Record<string, Card['rarity']> = {
+    'common': 'Common',
+    'rare': 'Rare',
+    'epic': 'Epic',
+    'legendary': 'Legendary',
+    'champion': 'Champion',
+  };
+  return rarityMap[apiRarity.toLowerCase()] || 'Common';
+};
+
+// Generate image URL from card name (fallback)
+const getCardImageUrl = (cardName: string): string => {
+  // Clash Royale card image URLs format
+  // Using royaleapi.com CDN as fallback - they have card images
+  const formattedName = cardName.replace(/\s+/g, '-').replace(/\./g, '').toLowerCase();
+  return `https://royaleapi.github.io/cr-api-data/img/cards-150/${formattedName}.png`;
+};
+
+// Convert API card to our Card interface
+const convertApiCard = (apiCard: ApiCard): Card => {
+  // Try multiple possible property names for rarity and elixir
+  const rarity = apiCard.rarity || apiCard.rarityName;
+  const elixir = apiCard.elixirCost || apiCard.elixir || apiCard.elixirElixir || 0;
+  const imageUrl = apiCard.iconUrls?.medium || getCardImageUrl(apiCard.name);
+  
+  return {
+    name: apiCard.name,
+    rarity: mapRarity(rarity),
+    elixir: elixir,
+    imageUrl: imageUrl,
+  };
+};
+
+// Better shuffle algorithm (Fisher-Yates)
+const shuffle = <T>(array: T[]): T[] => {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
+
+// Shuffle array and select random items
+const shuffleAndSelect = <T>(array: T[], count: number): T[] => {
+  const shuffled = shuffle(array);
+  return shuffled.slice(0, count);
+};
+
+export const generateGameBoard = async (): Promise<Card[]> => {
   try {
-    const prompt = `Generate a balanced list of exactly 16 distinct and popular Clash Royale cards. 
-    Focus on the category: "${category}". If the category is "Mix", choose a variety of troops, spells, and buildings.
+    // Use proxy in development (Vite dev server), direct API in production
+    // In dev, use relative path which will be proxied by Vite
+    const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const apiUrl = isDev 
+      ? '/api/clashroyale/cards' 
+      : `${API_BASE_URL}/cards`;
     
-    For each card, provide:
-    - Name
-    - Rarity (Common, Rare, Epic, Legendary, Champion)
-    - Elixir cost (number)
-    - A very short 3-5 word description suitable for a hint.
-    `;
-
-    const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              name: { type: Type.STRING },
-              rarity: { type: Type.STRING, enum: ['Common', 'Rare', 'Epic', 'Legendary', 'Champion'] },
-              elixir: { type: Type.INTEGER },
-              description: { type: Type.STRING }
-            },
-            required: ['name', 'rarity', 'elixir', 'description']
-          }
-        }
-      }
-    });
-
-    const cards = JSON.parse(response.text || "[]") as Card[];
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
     
-    // Ensure we have exactly 16, duplicate or slice if needed (fallback)
-    if (cards.length < 16) {
-      // Very basic fallback if AI fails to give 16
-      const fillers: Card[] = [
-        { name: "Knight", rarity: "Common", elixir: 3, description: "Good stats for cost" },
-        { name: "Archers", rarity: "Common", elixir: 3, description: "Two ranged attackers" },
-      ];
-      while (cards.length < 16) {
-        cards.push(fillers[0]);
-      }
+    // Only add auth header if not using proxy (proxy adds it server-side)
+    if (!isDev) {
+      headers['Authorization'] = `Bearer ${API_TOKEN}`;
     }
     
-    return cards.slice(0, 16);
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers,
+    });
+
+    if (!response.ok) {
+      throw new Error(`API request failed: ${response.status} ${response.statusText}`);
+    }
+
+    const data: ApiResponse = await response.json();
+    
+    // Debug: log the response structure to help troubleshoot
+    console.log('Clash Royale API response:', data);
+    console.log('Number of items:', data.items?.length || 0);
+    console.log('Number of supportItems:', data.supportItems?.length || 0);
+    
+    // Combine items and supportItems
+    const allCards = [...(data.items || []), ...(data.supportItems || [])];
+    
+    console.log('Total cards available:', allCards.length);
+    
+    if (allCards.length === 0) {
+      throw new Error("No cards returned from API");
+    }
+
+    // Select 16 random cards from all available cards
+    const selectedCards = shuffleAndSelect(allCards, 16);
+    console.log('Selected 16 random cards:', selectedCards.map(c => c.name));
+    
+    // Convert to our Card format
+    const cards = selectedCards.map(convertApiCard);
+
+    return cards;
   } catch (error) {
-    console.error("Failed to generate board:", error);
-    // Fallback static list to prevent app crash
-    return [
-      { name: "Hog Rider", rarity: "Rare", elixir: 4, description: "Fast building targeter" },
-      { name: "P.E.K.K.A", rarity: "Epic", elixir: 7, description: "Heavy melee damage" },
-      { name: "Mega Knight", rarity: "Legendary", elixir: 7, description: "Jump spawn damage" },
-      { name: "Log", rarity: "Legendary", elixir: 2, description: "Rolls through troops" },
-      { name: "Goblin Barrel", rarity: "Epic", elixir: 3, description: "Spawns goblins anywhere" },
-      { name: "Princess", rarity: "Legendary", elixir: 3, description: "Long range splash" },
-      { name: "Giant", rarity: "Rare", elixir: 5, description: "Tank targeting buildings" },
-      { name: "Musketeer", rarity: "Rare", elixir: 4, description: "Long range single target" },
-      { name: "Skeleton Army", rarity: "Epic", elixir: 3, description: "Swarm of skeletons" },
-      { name: "Baby Dragon", rarity: "Epic", elixir: 4, description: "Flying splash damage" },
-      { name: "Fireball", rarity: "Rare", elixir: 4, description: "Medium spell damage" },
-      { name: "Golem", rarity: "Epic", elixir: 8, description: "Massive tank explodes" },
-      { name: "Miner", rarity: "Legendary", elixir: 3, description: "Digs to anywhere" },
-      { name: "Zap", rarity: "Common", elixir: 2, description: "Stuns briefly" },
-      { name: "Inferno Tower", rarity: "Rare", elixir: 5, description: "Melts high HP" },
-      { name: "Balloon", rarity: "Epic", elixir: 5, description: "Drops bombs on buildings" },
+    console.error("Failed to fetch cards from Clash Royale API:", error);
+    console.error("Error details:", error);
+    
+    // Fallback: Use Merge Tactics cards with actual Clash Royale elixir costs
+    const fallbackCardNames = [
+      "Archer Queen", "Bandit", "Barbarians", "Dart Goblin", "Electro Giant",
+      "Elixir Collector", "Executioner", "Goblin", "Goblin Machine", "Golden Knight",
+      "Inferno Tower", "Mega Knight", "Mini P.E.K.K.A", "Monk", "Mortar",
+      "Musketeer", "P.E.K.K.A", "Prince", "Princess", "Royal Ghost",
+      "Royal Giant", "Skeleton", "Skeleton Dragon", "Skeleton King", "Spear Goblin",
+      "Tesla", "Valkyrie", "Witch", "Wizard", "X-Bow"
     ];
+    
+    const fallbackRarities: Record<string, Card['rarity']> = {
+      "Archer Queen": "Champion", "Bandit": "Legendary", "Barbarians": "Common",
+      "Dart Goblin": "Rare", "Electro Giant": "Legendary", "Elixir Collector": "Common",
+      "Executioner": "Epic", "Goblin": "Common", "Goblin Machine": "Epic",
+      "Golden Knight": "Champion", "Inferno Tower": "Rare", "Mega Knight": "Legendary",
+      "Mini P.E.K.K.A": "Rare", "Monk": "Champion", "Mortar": "Common",
+      "Musketeer": "Rare", "P.E.K.K.A": "Epic", "Prince": "Epic",
+      "Princess": "Legendary", "Royal Ghost": "Legendary", "Royal Giant": "Common",
+      "Skeleton": "Common", "Skeleton Dragon": "Rare", "Skeleton King": "Champion",
+      "Spear Goblin": "Common", "Tesla": "Common", "Valkyrie": "Rare",
+      "Witch": "Epic", "Wizard": "Rare", "X-Bow": "Epic"
+    };
+    
+    const fallbackElixirs: Record<string, number> = {
+      "Archer Queen": 5, "Bandit": 3, "Barbarians": 5, "Dart Goblin": 3,
+      "Electro Giant": 7, "Elixir Collector": 6, "Executioner": 5, "Goblin": 1,
+      "Goblin Machine": 4, "Golden Knight": 5, "Inferno Tower": 5, "Mega Knight": 7,
+      "Mini P.E.K.K.A": 4, "Monk": 5, "Mortar": 4, "Musketeer": 4, "P.E.K.K.A": 7,
+      "Prince": 5, "Princess": 3, "Royal Ghost": 3, "Royal Giant": 6, "Skeleton": 1,
+      "Skeleton Dragon": 4, "Skeleton King": 5, "Spear Goblin": 2, "Tesla": 4,
+      "Valkyrie": 4, "Witch": 5, "Wizard": 5, "X-Bow": 6
+    };
+    
+    const fallbackCards: Card[] = fallbackCardNames.map(name => ({
+      name,
+      rarity: fallbackRarities[name] || "Common",
+      elixir: fallbackElixirs[name] || 0,
+      imageUrl: getCardImageUrl(name),
+    }));
+    
+    // Randomly select 16 from the fallback pool
+    return shuffleAndSelect(fallbackCards, 16);
   }
 };
