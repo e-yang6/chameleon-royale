@@ -7,8 +7,29 @@ export default async function handler(
   req: VercelRequest,
   res: VercelResponse
 ) {
+  // Extract path from query params (catch-all route)
+  // With [...path].ts, the path segments are in req.query.path
   const { path } = req.query;
-  const pathString = Array.isArray(path) ? path.join('/') : path || '';
+  
+  console.log('Request query:', req.query);
+  console.log('Request URL:', req.url);
+  
+  let pathString = '';
+  if (Array.isArray(path)) {
+    pathString = path.join('/');
+  } else if (typeof path === 'string') {
+    pathString = path;
+  }
+  
+  // If still empty, the rewrite might not be working correctly
+  if (!pathString) {
+    console.error('Path is empty! Query:', req.query, 'URL:', req.url);
+    return res.status(500).json({ 
+      error: 'Path parameter is missing', 
+      query: req.query,
+      url: req.url 
+    });
+  }
   
   const apiToken = process.env.CLASH_ROYALE_API_TOKEN;
   
@@ -48,7 +69,9 @@ export default async function handler(
       return res.status(500).json({ 
         error: 'API returned documentation instead of data', 
         message: 'The endpoint may be incorrect or the proxy service is returning Swagger docs',
-        url: apiUrl,
+        url: apiUrl.replace(apiToken, '***'),
+        constructedUrl: apiUrl.replace(apiToken, '***'),
+        pathReceived: pathString,
         status: response.status
       });
     }
