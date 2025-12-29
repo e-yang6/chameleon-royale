@@ -18,7 +18,7 @@ export default async function handler(
   }
   
   try {
-    // Construct URL using WHATWG URL API to avoid deprecation warnings
+    // Construct URL - proxy.royaleapi.dev replaces api.clashroyale.com
     const baseUrl = 'https://proxy.royaleapi.dev/v1';
     // Ensure path starts with / and construct full URL
     const cleanPath = pathString.startsWith('/') ? pathString : `/${pathString}`;
@@ -32,7 +32,19 @@ export default async function handler(
       },
     });
     
-    const data = await response.json();
+    let data;
+    try {
+      data = await response.json();
+    } catch (parseError) {
+      const text = await response.text();
+      console.error('Failed to parse response as JSON:', text);
+      return res.status(500).json({ 
+        error: 'Invalid response from API', 
+        status: response.status,
+        statusText: response.statusText,
+        body: text.substring(0, 500) // First 500 chars
+      });
+    }
     
     // Log error details for debugging
     if (!response.ok) {
@@ -44,12 +56,24 @@ export default async function handler(
         hasToken: !!apiToken,
         tokenLength: apiToken?.length || 0,
       });
+      // Return error with details for debugging
+      return res.status(response.status).json({
+        error: 'API request failed',
+        status: response.status,
+        statusText: response.statusText,
+        details: data,
+        url: apiUrl,
+      });
     }
     
     return res.status(response.status).json(data);
   } catch (error) {
     console.error('Proxy error:', error);
-    return res.status(500).json({ error: 'Failed to fetch from API', details: error instanceof Error ? error.message : String(error) });
+    return res.status(500).json({ 
+      error: 'Failed to fetch from API', 
+      details: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined
+    });
   }
 }
 
