@@ -8,59 +8,82 @@ interface CardGridProps {
 }
 
 export const CardGrid: React.FC<CardGridProps> = ({ cards, secretCard, revealSecret = false }) => {
-  const getRarityColor = (rarity: string) => {
+  const getRarityBorder = (rarity: string) => {
     switch(rarity) {
-      case 'Legendary': return 'bg-gradient-to-r from-purple-500 via-pink-500 to-yellow-500'; // Gradient line
-      case 'Epic': return 'bg-purple-500';
-      case 'Rare': return 'bg-orange-500';
-      case 'Champion': return 'bg-yellow-400';
-      default: return 'bg-blue-400'; // Common
+      case 'Legendary': return 'border-yellow-500/60';
+      case 'Epic': return 'border-purple-500/60';
+      case 'Rare': return 'border-blue-500/60';
+      case 'Champion': return 'border-orange-500/60';
+      default: return 'border-zinc-700/60';
     }
   };
 
-  const getRarityText = (rarity: string) => {
+  const getRarityBg = (rarity: string) => {
     switch(rarity) {
-      case 'Legendary': return 'text-purple-300';
-      case 'Epic': return 'text-purple-400';
-      case 'Rare': return 'text-orange-400';
-      case 'Champion': return 'text-yellow-400';
-      default: return 'text-blue-300';
+      case 'Legendary': return 'bg-slate-800/50';
+      case 'Epic': return 'bg-slate-800/50';
+      case 'Rare': return 'bg-slate-800/50';
+      case 'Champion': return 'bg-slate-800/50';
+      default: return 'bg-slate-800/50';
     }
   };
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-5xl mx-auto">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 md:gap-4 max-w-6xl mx-auto p-1 sm:p-2">
       {cards.map((card, idx) => {
         const isSecret = revealSecret && secretCard?.name === card.name;
         
         return (
           <div 
             key={idx} 
-            className={`group relative rounded-xl overflow-hidden bg-zinc-900 border transition-all duration-300 ${
+            className={`group relative rounded-lg overflow-hidden border-2 transition-all duration-200 touch-manipulation ${
               isSecret 
-                ? 'border-emerald-500 ring-1 ring-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.3)]' 
-                : 'border-zinc-800 hover:border-zinc-600'
-            }`}
+                ? 'border-emerald-500 scale-105' 
+                : `${getRarityBorder(card.rarity)} active:scale-[0.98]`
+            } ${getRarityBg(card.rarity)}`}
           >
-            {/* Rarity Line Indicator at bottom */}
-            <div className={`absolute bottom-0 left-0 right-0 h-1 ${getRarityColor(card.rarity)} opacity-50 group-hover:opacity-100 transition-opacity`}></div>
+            {/* Card Image */}
+            {card.imageUrl && (
+              <div className="absolute inset-0 opacity-20 group-hover:opacity-30 transition-opacity">
+                <img 
+                  src={card.imageUrl} 
+                  alt={card.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                />
+              </div>
+            )}
 
-            <div className="p-4 flex flex-col h-full min-h-[120px] relative">
-              <div className="absolute top-4 left-4 right-4 flex justify-between items-start">
-                 {/* Coordinate */}
-                <span className="text-[10px] font-mono text-zinc-600 uppercase tracking-widest">
-                  {String.fromCharCode(65 + Math.floor(idx / 4))}{ (idx % 4) + 1 }
-                </span>
-                
-                {/* Elixir */}
-                <span className="flex items-center justify-center w-5 h-5 rounded-full bg-zinc-800 text-purple-400 border border-purple-500/30 text-[10px] font-bold">
-                  {card.elixir}
-                </span>
+            <div className="relative p-2 sm:p-3 md:p-4 flex flex-col h-full min-h-[120px] sm:min-h-[140px] md:min-h-[160px]">
+              {/* Elixir Cost - Top Right */}
+              <div className="absolute top-1.5 right-1.5 sm:top-2 sm:right-2 flex items-center justify-center w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-black/60 backdrop-blur-sm border border-zinc-600/50 text-white text-[10px] sm:text-xs font-bold">
+                {card.elixir}
               </div>
 
-              <div className="flex-1 flex flex-col justify-center items-center text-center">
-                <h3 className="font-semibold text-zinc-100 text-sm md:text-base leading-tight">{card.name}</h3>
-                <p className={`text-[10px] uppercase tracking-wider mt-1 font-medium ${getRarityText(card.rarity)} opacity-70`}>{card.rarity}</p>
+              {/* Card Content */}
+              <div className="flex-1 flex flex-col justify-center items-center text-center mt-1 sm:mt-2">
+                {card.imageUrl && (
+                  <div className="mb-1 sm:mb-2 w-12 h-16 sm:w-16 sm:h-20 md:w-20 md:h-24 relative">
+                    <img 
+                      src={card.imageUrl} 
+                      alt={card.name}
+                      className="w-full h-full object-contain"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = 'none';
+                      }}
+                    />
+                  </div>
+                )}
+                
+                <h3 className="font-bold text-white text-xs sm:text-sm md:text-base leading-tight mb-0.5 sm:mb-1 px-1">
+                  {card.name}
+                </h3>
+                
+                <span className="text-[8px] sm:text-[9px] md:text-[10px] uppercase tracking-wider font-semibold text-zinc-400">
+                  {card.rarity}
+                </span>
               </div>
             </div>
           </div>

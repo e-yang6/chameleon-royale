@@ -3,7 +3,6 @@ import { Player, GameState, Card } from './types';
 import { generateGameBoard } from './services/geminiService';
 import { Button } from './components/Button';
 import { CardGrid } from './components/CardGrid';
-import { Trophy, Users, Eye, EyeOff, Play, Info, RotateCcw, UserPlus, Crown } from 'lucide-react';
 
 function App() {
   const [gameState, setGameState] = useState<GameState>({
@@ -132,40 +131,40 @@ function App() {
   // --- Renders ---
 
   const renderSetup = () => (
-    <div className="flex flex-col items-center justify-center min-h-screen p-6 max-w-lg mx-auto w-full">
-      <div className="w-full space-y-8">
-        <div className="text-center space-y-3">
-          <h1 className="text-4xl md:text-5xl text-white font-bold tracking-wide">
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 max-w-lg mx-auto w-full">
+      <div className="w-full space-y-6 sm:space-y-8">
+        <div className="text-center space-y-2 sm:space-y-3">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl text-white font-bold tracking-wide">
             Chameleon Royale
           </h1>
         </div>
 
-        <div className="space-y-6">
+        <div className="space-y-5 sm:space-y-6">
           <div className="space-y-2">
             <h2 className="text-xs uppercase tracking-widest text-zinc-500 font-semibold">Players</h2>
-            <div className="divide-y divide-zinc-800 border-t border-b border-zinc-800">
+            <div className="divide-y divide-slate-700 border-t border-b border-slate-700 rounded-lg bg-slate-800/40">
               {gameState.players.map(p => (
-                <div key={p.id} className="flex justify-between items-center py-3">
-                  <span className="font-medium text-zinc-300">{p.name}</span>
-                  <button onClick={() => removePlayer(p.id)} className="text-zinc-600 hover:text-red-400 transition-colors text-sm">Remove</button>
+                <div key={p.id} className="flex justify-between items-center py-3 sm:py-4 px-3 hover:bg-slate-700/50 transition-colors rounded">
+                  <span className="font-medium text-zinc-200 text-sm sm:text-base">{p.name}</span>
+                  <button onClick={() => removePlayer(p.id)} className="text-red-400 hover:text-red-300 transition-colors text-sm px-3 py-2 -mr-3 touch-manipulation font-medium">Remove</button>
                 </div>
               ))}
               {gameState.players.length === 0 && (
-                <div className="py-4 text-zinc-600 italic text-sm text-center">Add at least 3 players to start</div>
+                <div className="py-4 text-slate-400 italic text-sm text-center">Add at least 3 players to start</div>
               )}
             </div>
             
-            <div className="flex gap-3 pt-2">
+            <div className="flex gap-2 sm:gap-3 pt-2">
               <input 
                 type="text" 
                 value={playerName}
                 onChange={(e) => setPlayerName(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && addPlayer()}
                 placeholder="Player name"
-                className="flex-1 bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-2 text-white placeholder-zinc-600 focus:outline-none focus:border-zinc-500 transition-colors text-sm"
+                className="flex-1 bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 sm:py-2 text-white placeholder-slate-400 focus:outline-none focus:border-slate-500 focus:ring-2 focus:ring-slate-500/30 transition-all text-base sm:text-sm"
               />
-              <Button onClick={addPlayer} size="md" variant="secondary" disabled={!playerName.trim()} className="shrink-0">
-                <UserPlus size={16} />
+              <Button onClick={addPlayer} size="md" variant="secondary" disabled={!playerName.trim()} className="shrink-0 min-h-[44px] touch-manipulation">
+                Add
               </Button>
             </div>
           </div>
@@ -173,48 +172,48 @@ function App() {
           <div className="space-y-4">
             <h2 className="text-xs uppercase tracking-widest text-zinc-500 font-semibold">Game Mode</h2>
             <div className="flex flex-col gap-2">
-              <label className="flex items-center gap-3 p-3 rounded-lg border border-zinc-800 bg-zinc-900/50 cursor-pointer hover:bg-zinc-900 transition-colors">
+              <label className="flex items-center gap-3 p-3 sm:p-4 rounded-lg border border-slate-700 bg-slate-800/40 cursor-pointer hover:bg-slate-700/50 hover:border-slate-600 transition-all touch-manipulation">
                 <input
                   type="radio"
                   name="gameMode"
                   value="classic"
                   checked={gameMode === 'classic'}
                   onChange={(e) => setGameMode(e.target.value as 'classic' | 'impostor')}
-                  className="w-4 h-4 text-white bg-zinc-800 border-zinc-600 focus:ring-2 focus:ring-white"
+                  className="w-5 h-5 sm:w-4 sm:h-4 text-blue-400 bg-slate-700 border-slate-600 focus:ring-2 focus:ring-blue-400 flex-shrink-0"
                 />
                 <div className="flex-1">
-                  <div className="text-sm font-medium text-white">Classic</div>
-                  <div className="text-xs text-zinc-500">Chameleon knows they're the impostor</div>
+                  <div className="text-sm sm:text-base font-medium text-white">Classic</div>
+                  <div className="text-xs sm:text-sm text-slate-400">Chameleon knows they're the impostor</div>
                 </div>
               </label>
-              <label className="flex items-center gap-3 p-3 rounded-lg border border-zinc-800 bg-zinc-900/50 cursor-pointer hover:bg-zinc-900 transition-colors">
+              <label className="flex items-center gap-3 p-3 sm:p-4 rounded-lg border border-slate-700 bg-slate-800/40 cursor-pointer hover:bg-slate-700/50 hover:border-slate-600 transition-all touch-manipulation">
                 <input
                   type="radio"
                   name="gameMode"
                   value="impostor"
                   checked={gameMode === 'impostor'}
                   onChange={(e) => setGameMode(e.target.value as 'classic' | 'impostor')}
-                  className="w-4 h-4 text-white bg-zinc-800 border-zinc-600 focus:ring-2 focus:ring-white"
+                  className="w-5 h-5 sm:w-4 sm:h-4 text-blue-400 bg-slate-700 border-slate-600 focus:ring-2 focus:ring-blue-400 flex-shrink-0"
                 />
                 <div className="flex-1">
-                  <div className="text-sm font-medium text-white">Impostor</div>
-                  <div className="text-xs text-zinc-500">Impostor gets a fake card and doesn't know</div>
+                  <div className="text-sm sm:text-base font-medium text-white">Impostor</div>
+                  <div className="text-xs sm:text-sm text-slate-400">Impostor gets a fake card and doesn't know</div>
                 </div>
               </label>
             </div>
           </div>
 
           <div className="space-y-2">
-            <label className="flex items-center gap-3 p-3 rounded-lg border border-zinc-800 bg-zinc-900/50 cursor-pointer hover:bg-zinc-900 transition-colors">
+            <label className="flex items-center gap-3 p-3 sm:p-4 rounded-lg border border-slate-700 bg-slate-800/40 cursor-pointer hover:bg-slate-700/50 hover:border-slate-600 transition-all touch-manipulation">
               <input
                 type="checkbox"
                 checked={hideBoard}
                 onChange={(e) => setHideBoard(e.target.checked)}
-                className="w-4 h-4 text-white bg-zinc-800 border-zinc-600 rounded focus:ring-2 focus:ring-white"
+                className="w-5 h-5 sm:w-4 sm:h-4 text-blue-400 bg-slate-700 border-slate-600 rounded focus:ring-2 focus:ring-blue-400 flex-shrink-0"
               />
               <div className="flex-1">
-                <div className="text-sm font-medium text-white">Hide Board</div>
-                <div className="text-xs text-zinc-500">Hide card grid during gameplay</div>
+                <div className="text-sm sm:text-base font-medium text-white">Hide Board</div>
+                <div className="text-xs sm:text-sm text-slate-400">Hide card grid during gameplay</div>
               </div>
             </label>
           </div>
@@ -224,14 +223,14 @@ function App() {
           <Button 
             variant="primary" 
             size="lg" 
-            className="w-full"
+            className="w-full min-h-[48px] touch-manipulation"
             onClick={startGame}
             disabled={gameState.players.length < 3}
           >
             Start Game
           </Button>
-          <button onClick={() => setShowRules(true)} className="text-zinc-600 hover:text-zinc-400 text-sm flex items-center justify-center gap-2 transition-colors">
-            <Info size={14} /> How to play
+          <button onClick={() => setShowRules(true)} className="text-zinc-600 hover:text-zinc-400 text-sm sm:text-base transition-colors py-2 touch-manipulation">
+            How to play
           </button>
         </div>
       </div>
@@ -251,17 +250,17 @@ function App() {
   const renderRevealInterstitial = () => {
     const player = gameState.players[gameState.currentPlayerIndex];
     return (
-      <div className="flex flex-col items-center justify-center h-screen p-6 bg-zinc-950">
-        <div className="max-w-md w-full text-center space-y-12">
+      <div className="flex flex-col items-center justify-center h-screen p-4 sm:p-6 bg-slate-900">
+        <div className="max-w-md w-full text-center space-y-8 sm:space-y-12">
           <div>
              <h2 className="text-zinc-500 uppercase tracking-widest text-xs mb-2">Next Player</h2>
-             <div className="text-4xl font-bold text-white">{player.name}</div>
+             <div className="text-3xl sm:text-4xl font-bold text-white">{player.name}</div>
           </div>
           
-          <div className="p-8 border border-zinc-800 rounded-2xl bg-zinc-900/50">
-            <p className="text-zinc-400 mb-8 leading-relaxed">Pass the device to {player.name}. <br/>Tap below to reveal your secret role.</p>
-            <Button onClick={nextReveal} size="lg" className="w-full">
-              <Eye className="mr-2 w-4 h-4" /> Reveal
+          <div className="p-6 sm:p-8 border border-slate-700 rounded-2xl bg-slate-800/50">
+            <p className="text-zinc-400 mb-6 sm:mb-8 leading-relaxed text-sm sm:text-base">Pass the device to {player.name}. <br/>Tap below to reveal your secret role.</p>
+            <Button onClick={nextReveal} size="lg" className="w-full min-h-[48px] touch-manipulation">
+              Reveal
             </Button>
           </div>
         </div>
@@ -281,41 +280,40 @@ function App() {
     const showAsChameleon = isChameleon && !isImpostorMode; // Only show chameleon status in classic mode
 
     return (
-      <div className="flex flex-col items-center justify-center h-screen p-6 bg-zinc-950">
-        <div className={`max-w-md w-full text-center p-10 rounded-2xl border transition-colors duration-500 ${showAsChameleon ? 'border-red-900/50 bg-red-950/10' : 'border-emerald-900/50 bg-emerald-950/10'}`}>
+      <div className="flex flex-col items-center justify-center h-screen p-4 sm:p-6 bg-slate-900">
+        <div className={`max-w-md w-full text-center p-6 sm:p-10 rounded-2xl border transition-colors duration-500 ${showAsChameleon ? 'border-red-500/30 bg-red-500/10' : 'border-green-500/30 bg-green-500/10'}`}>
           
-          <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-8">Your Identity</h2>
+          <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6 sm:mb-8">Your Identity</h2>
           
           {showAsChameleon ? (
-            <div className="mb-12 space-y-4">
-              <div className="text-6xl">🦎</div>
-              <h1 className="text-3xl font-bold text-red-500">Chameleon</h1>
-              <p className="text-zinc-400 text-sm max-w-xs mx-auto">Blend in. You don't know the secret card. Listen to others and bluff.</p>
+            <div className="mb-8 sm:mb-12 space-y-3 sm:space-y-4">
+              <div className="text-5xl sm:text-6xl">🦎</div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-red-500">Chameleon</h1>
             </div>
           ) : (
-            <div className="mb-12 space-y-6">
-              <div className="text-6xl">🛡️</div>
-              <h1 className="text-3xl font-bold text-emerald-500">Citizen</h1>
-              <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-xl">
-                <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-4">Secret Card</p>
+            <div className="mb-8 sm:mb-12 space-y-4 sm:space-y-6">
+              <div className="text-5xl sm:text-6xl">🛡️</div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-emerald-500">Citizen</h1>
+              <div className="bg-slate-800 border border-slate-700 p-4 sm:p-6 rounded-xl">
+                <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-3 sm:mb-4">Secret Card</p>
                 {cardToShow?.imageUrl && (
                   <img 
                     src={cardToShow.imageUrl} 
                     alt={cardToShow.name}
-                    className="w-32 h-40 object-contain mx-auto mb-4"
+                    className="w-24 h-32 sm:w-32 sm:h-40 object-contain mx-auto mb-3 sm:mb-4"
                     onError={(e) => {
                       // Hide image on error
                       (e.target as HTMLImageElement).style.display = 'none';
                     }}
                   />
                 )}
-                <p className="text-2xl font-bold text-white">{cardToShow?.name}</p>
+                <p className="text-xl sm:text-2xl font-bold text-white">{cardToShow?.name}</p>
               </div>
             </div>
           )}
 
-          <Button onClick={finishReveal} variant="secondary" className="w-full">
-            <EyeOff className="mr-2 w-4 h-4" /> Hide & Pass
+          <Button onClick={finishReveal} variant="secondary" className="w-full min-h-[48px] touch-manipulation">
+            Hide & Pass
           </Button>
         </div>
       </div>
@@ -326,32 +324,29 @@ function App() {
     const starter = gameState.players.find(p => p.id === gameState.starterPlayerId);
     
     return (
-      <div className="flex flex-col h-screen overflow-hidden bg-zinc-950">
-        <div className="flex-none px-6 py-4 border-b border-zinc-900 flex justify-between items-center z-10 bg-zinc-950/80 backdrop-blur-sm">
-             <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-full bg-zinc-900 flex items-center justify-center text-yellow-500">
-                    <Crown size={16} fill="currentColor" />
-                </div>
-                <div className="flex flex-col">
+      <div className="flex flex-col h-screen overflow-hidden bg-slate-900">
+        <div className="flex-none px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-700 flex justify-between items-center z-10 bg-slate-900/80 backdrop-blur-sm gap-3">
+             <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+                <div className="flex flex-col min-w-0">
                     <span className="text-[10px] text-zinc-500 uppercase tracking-wider">First Turn</span>
-                    <span className="text-sm font-medium text-white">{starter?.name}</span>
+                    <span className="text-xs sm:text-sm font-medium text-white truncate">{starter?.name}</span>
                 </div>
             </div>
             
-            <Button onClick={() => setGameState(prev => ({...prev, phase: 'VOTING'}))} size="sm" variant="danger">
+            <Button onClick={() => setGameState(prev => ({...prev, phase: 'VOTING'}))} size="sm" variant="danger" className="shrink-0 min-h-[40px] touch-manipulation">
                 Start Voting
             </Button>
         </div>
 
         {gameState.hideBoard ? (
-          <div className="flex-1 flex items-center justify-center p-6">
-            <div className="text-center space-y-4">
-              <p className="text-zinc-500 text-lg">Board is hidden</p>
-              <p className="text-zinc-600 text-sm">Discuss and give hints without seeing the cards</p>
+          <div className="flex-1 flex items-center justify-center p-4 sm:p-6">
+            <div className="text-center space-y-3 sm:space-y-4">
+              <p className="text-zinc-500 text-base sm:text-lg">Board is hidden</p>
+              <p className="text-zinc-600 text-sm sm:text-base">Discuss and give hints without seeing the cards</p>
             </div>
           </div>
         ) : (
-          <div className="flex-1 overflow-y-auto p-6">
+          <div className="flex-1 overflow-y-auto p-3 sm:p-6">
             <CardGrid cards={gameState.boardCards} />
           </div>
         )}
@@ -360,23 +355,23 @@ function App() {
   };
 
   const renderVoting = () => (
-    <div className="flex flex-col items-center justify-center h-screen p-6 bg-zinc-950">
-        <div className="max-w-md w-full space-y-12 text-center">
-            <div className="space-y-4">
-                <h2 className="text-3xl font-bold text-white">Who is the Chameleon?</h2>
-                <p className="text-zinc-500">Discuss, point fingers, and cast your votes.</p>
+    <div className="flex flex-col items-center justify-center h-screen p-4 sm:p-6 bg-zinc-950">
+        <div className="max-w-md w-full space-y-8 sm:space-y-12 text-center">
+            <div className="space-y-3 sm:space-y-4">
+                <h2 className="text-2xl sm:text-3xl font-bold text-white">Who is the Chameleon?</h2>
+                <p className="text-zinc-500 text-sm sm:text-base px-2">Discuss, point fingers, and cast your votes.</p>
             </div>
             
-            <div className="grid gap-4">
-                <Button variant="danger" size="lg" onClick={() => handleVoteEnd(true)} className="w-full">
+            <div className="grid gap-3 sm:gap-4">
+                <Button variant="danger" size="lg" onClick={() => handleVoteEnd(true)} className="w-full min-h-[48px] touch-manipulation">
                     Chameleon Caught
                 </Button>
-                <Button variant="secondary" size="lg" onClick={() => handleVoteEnd(false)} className="w-full">
+                <Button variant="secondary" size="lg" onClick={() => handleVoteEnd(false)} className="w-full min-h-[48px] touch-manipulation">
                     Chameleon Escaped
                 </Button>
             </div>
 
-            <button onClick={() => setGameState(prev => ({...prev, phase: 'PLAYING'}))} className="text-zinc-600 hover:text-white text-sm transition-colors">
+            <button onClick={() => setGameState(prev => ({...prev, phase: 'PLAYING'}))} className="text-zinc-600 hover:text-white text-sm sm:text-base transition-colors py-2 touch-manipulation">
                 Back to board
             </button>
         </div>
@@ -388,53 +383,48 @@ function App() {
     const chameleon = gameState.players.find(p => p.isChameleon);
 
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-zinc-950 text-center">
-         <div className="max-w-3xl w-full space-y-10">
-            <div className="space-y-4">
-                {isCitizenWin ? (
-                    <Trophy className="w-16 h-16 text-yellow-500 mx-auto stroke-1" />
-                ) : (
-                    <div className="text-6xl">🦎</div>
-                )}
-                <h1 className="text-4xl font-bold text-white tracking-tight">
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 bg-slate-900 text-center">
+         <div className="max-w-3xl w-full space-y-6 sm:space-y-10">
+            <div className="space-y-3 sm:space-y-4">
+                <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
                     {isCitizenWin ? 'Citizens Win' : 'Chameleon Wins'}
                 </h1>
-                <p className="text-lg text-zinc-400">
+                <p className="text-base sm:text-lg text-zinc-400 px-2">
                     The Chameleon was <span className="text-white font-medium border-b border-zinc-700 pb-0.5">{chameleon?.name}</span>
                 </p>
             </div>
 
-            <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 max-w-sm mx-auto">
-                <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-4">Secret Card</p>
+            <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 sm:p-6 max-w-sm mx-auto">
+                <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-3 sm:mb-4">Secret Card</p>
                 {gameState.secretCard && (
                     <div className="flex flex-col items-center">
                         {gameState.secretCard.imageUrl && (
                           <img 
                             src={gameState.secretCard.imageUrl} 
                             alt={gameState.secretCard.name}
-                            className="w-32 h-40 object-contain mb-4"
+                            className="w-24 h-32 sm:w-32 sm:h-40 object-contain mb-3 sm:mb-4"
                             onError={(e) => {
                               // Hide image on error
                               (e.target as HTMLImageElement).style.display = 'none';
                             }}
                           />
                         )}
-                        <h2 className="text-2xl font-bold text-white mb-1">{gameState.secretCard.name}</h2>
+                        <h2 className="text-xl sm:text-2xl font-bold text-white mb-1">{gameState.secretCard.name}</h2>
                         <span className="text-xs text-zinc-500">{gameState.secretCard.rarity}</span>
                     </div>
                 )}
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
                <h3 className="text-xs text-zinc-500 uppercase tracking-widest">Board Review</h3>
-               <div className="h-64 overflow-y-auto rounded-xl border border-zinc-800 bg-zinc-900/50 p-2">
+               <div className="h-48 sm:h-64 overflow-y-auto rounded-xl border border-slate-700 bg-slate-800/50 p-2">
                  <CardGrid cards={gameState.boardCards} secretCard={gameState.secretCard} revealSecret={true} />
                </div>
             </div>
 
-            <div className="flex gap-4 justify-center pt-6">
-                <Button onClick={playAgainSamePlayers} size="lg">Play Again</Button>
-                <Button onClick={resetGame} variant="secondary" size="lg"> <RotateCcw size={16} className="mr-2" /> Reset</Button>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center pt-4 sm:pt-6">
+                <Button onClick={playAgainSamePlayers} size="lg" className="w-full sm:w-auto min-h-[48px] touch-manipulation">Play Again</Button>
+                <Button onClick={resetGame} variant="secondary" size="lg" className="w-full sm:w-auto min-h-[48px] touch-manipulation">Reset</Button>
             </div>
          </div>
       </div>
@@ -442,25 +432,25 @@ function App() {
   };
 
   const RulesModal = () => (
-    <div className="fixed inset-0 bg-zinc-950/90 backdrop-blur-sm flex items-center justify-center z-50 p-6">
-      <div className="bg-zinc-900 rounded-2xl max-w-md w-full p-8 border border-zinc-800 relative shadow-2xl">
-        <button onClick={() => setShowRules(false)} className="absolute top-6 right-6 text-zinc-500 hover:text-white transition-colors">✕</button>
-        <h2 className="text-xl font-bold text-white mb-6">How to Play</h2>
-        <div className="space-y-4 text-zinc-400 text-sm leading-relaxed">
+    <div className="fixed inset-0 bg-slate-900/90 backdrop-blur-sm flex items-center justify-center z-50 p-4 sm:p-6">
+      <div className="bg-slate-800 rounded-2xl max-w-md w-full p-6 sm:p-8 border border-slate-700 relative max-h-[90vh] overflow-y-auto">
+        <button onClick={() => setShowRules(false)} className="absolute top-4 right-4 sm:top-6 sm:right-6 text-zinc-500 hover:text-white transition-colors text-2xl w-8 h-8 flex items-center justify-center touch-manipulation">✕</button>
+        <h2 className="text-lg sm:text-xl font-bold text-white mb-4 sm:mb-6 pr-8">How to Play</h2>
+        <div className="space-y-3 sm:space-y-4 text-zinc-400 text-sm sm:text-base leading-relaxed">
             <p><strong className="text-white">1. Roles:</strong> One person is the Chameleon. Others are Citizens.</p>
             <p><strong className="text-white">2. Secret:</strong> Citizens know the Secret Card. The Chameleon does not.</p>
             <p><strong className="text-white">3. Hints:</strong> Go around and say ONE word related to the Secret Card.</p>
             <p><strong className="text-white">4. Goal:</strong> Citizens try to find the Chameleon. The Chameleon tries to blend in or guess the card.</p>
         </div>
-        <div className="mt-8 pt-6 border-t border-zinc-800">
-            <Button onClick={() => setShowRules(false)} size="md" className="w-full">Start Playing</Button>
+        <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-slate-700">
+            <Button onClick={() => setShowRules(false)} size="md" className="w-full min-h-[44px] touch-manipulation">Start Playing</Button>
         </div>
       </div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-white selection:text-black">
+    <div className="min-h-screen bg-slate-900 text-zinc-100 font-sans selection:bg-purple-500/30 selection:text-white">
       {gameState.phase === 'SETUP' && renderSetup()}
       {gameState.phase === 'LOADING_BOARD' && renderLoading()}
       {gameState.phase === 'REVEAL_INTERSTITIAL' && renderRevealInterstitial()}
