@@ -8,17 +8,14 @@ export default async function handler(
   res: VercelResponse
 ) {
   // Extract path from query params (catch-all route)
-  // With [...path].ts, the path segments are in req.query.path
-  const { path } = req.query;
-  
-  console.log('Request query:', req.query);
-  console.log('Request URL:', req.url);
+  // With [...path].ts, Vercel creates a query param named '...path' (with dots)
+  const pathParam = req.query['...path'] || req.query.path;
   
   let pathString = '';
-  if (Array.isArray(path)) {
-    pathString = path.join('/');
-  } else if (typeof path === 'string') {
-    pathString = path;
+  if (Array.isArray(pathParam)) {
+    pathString = pathParam.join('/');
+  } else if (typeof pathParam === 'string') {
+    pathString = pathParam;
   }
   
   // If still empty, the rewrite might not be working correctly
