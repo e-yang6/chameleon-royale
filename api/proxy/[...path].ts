@@ -22,12 +22,13 @@ export default async function handler(
     const baseUrl = 'https://proxy.royaleapi.dev/v1';
     // Ensure path starts with / and construct full URL
     const cleanPath = pathString.startsWith('/') ? pathString : `/${pathString}`;
-    const apiUrl = `${baseUrl}${cleanPath}`;
+    
+    // Try with API key as query parameter (proxy.royaleapi.dev may expect this format)
+    const apiUrl = `${baseUrl}${cleanPath}?key=${encodeURIComponent(apiToken)}`;
     
     const response = await fetch(apiUrl, {
       method: req.method || 'GET',
       headers: {
-        'Authorization': `Bearer ${apiToken}`,
         'Content-Type': 'application/json',
       },
     });
@@ -51,7 +52,7 @@ export default async function handler(
       console.error('Clash Royale API error:', {
         status: response.status,
         statusText: response.statusText,
-        url: apiUrl,
+        url: apiUrl.replace(apiToken, '***'),
         error: data,
         hasToken: !!apiToken,
         tokenLength: apiToken?.length || 0,
@@ -62,7 +63,7 @@ export default async function handler(
         status: response.status,
         statusText: response.statusText,
         details: data,
-        url: apiUrl,
+        url: apiUrl.replace(apiToken, '***'),
       });
     }
     
