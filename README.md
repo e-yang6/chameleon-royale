@@ -1,43 +1,35 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# Chameleon Royale 🦎
 
-# Run and deploy your AI Studio app
+A party game where you try to catch the Chameleon hiding among Clash Royale cards.
 
-This contains everything you need to run your app locally.
+**Play it here:** [chameleon-royale.vercel.app](https://chameleon-royale.vercel.app)
 
-View your app in AI Studio: https://ai.studio/apps/drive/1ZSr3PdIaMpt_QJTkl36NDVwlH7iV9wee
+## What's this?
 
-## Run Locally
+Social deduction game for 3+ players. One person is the **Chameleon** (doesn't know the secret card), everyone else are **Citizens** (they know it). Citizens try to find the Chameleon, Chameleon tries to blend in or guess the card.
 
-**Prerequisites:**  Node.js
+## How to play
 
+1. Add at least 3 players
+2. Pick your mode (Classic or Impostor)
+3. Everyone sees their role and the secret card (if you're a Citizen)
+4. Go around the circle - each person says ONE word related to the secret card
+5. Discuss and figure out who's the Chameleon
+6. Vote: did you catch them or did they escape?
+7. See who it was and what the card was
 
-1. Install dependencies:
-   `npm install`
-2. Create a `.env.local` file in the root directory and set `CLASH_ROYALE_API_TOKEN`:
-   ```
-   CLASH_ROYALE_API_TOKEN=your_clash_royale_api_token_here
-   ```
-3. Run the app:
-   `npm run dev`
+## Game modes
 
-## Deploying
+**Classic**: Chameleon knows they're the impostor and has to blend in without knowing the card.
 
-The app requires a proxy to access the Clash Royale API (to keep the API token secure and bypass CORS).
+**Impostor**: Chameleon gets a fake card and doesn't know they're the Chameleon.
 
-### Vercel Deployment
-1. The `vercel.json` and `api/proxy/[...path].ts` files are already set up
-2. Add `CLASH_ROYALE_API_TOKEN` to your Vercel environment variables
-3. Deploy - the proxy will automatically work
+## Tips
 
-### Netlify Deployment
-1. The `netlify.toml` and `netlify/functions/proxy.ts` files are already set up
-2. Add `CLASH_ROYALE_API_TOKEN` to your Netlify environment variables
-3. Deploy - the proxy will automatically work
+- **Citizens**: Give hints that prove you know the card, but not so obvious the Chameleon can guess it
+- **Chameleon**: Listen to the hints and try to blend in, or take a guess
+- **Hide Board**: Turn this on to hide the card grid during gameplay
 
-### Other Platforms
-You'll need to set up a proxy/rewrite rule that:
-- Rewrites `/api/clashroyale/*` to your backend proxy function
-- The proxy should add the `Authorization: Bearer <token>` header
-- Set `CLASH_ROYALE_API_TOKEN` as an environment variable
+## For devs
+
+Built with React + TypeScript. To run locally, you'll need a Clash Royale API key (set it in `.env.local` as `CLASH_ROYALE_API_TOKEN`). Uses proxy.royaleapi.dev, so whitelist IP `45.79.218.79` on your API key.

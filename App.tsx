@@ -56,9 +56,8 @@ function App() {
     const cards = await generateGameBoard();
     const secret = cards[Math.floor(Math.random() * cards.length)];
     
-    // Assign Chameleon
-    const playerIndices = Array.from({ length: gameState.players.length }, (_, i) => i);
-    const chameleonIndex = playerIndices[Math.floor(Math.random() * playerIndices.length)];
+    // Assign Chameleon randomly
+    const chameleonIndex = Math.floor(Math.random() * gameState.players.length);
     
     const updatedPlayers = gameState.players.map((p, idx) => ({
       ...p,

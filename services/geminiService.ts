@@ -106,14 +106,6 @@ export const generateGameBoard = async (): Promise<Card[]> => {
         errorData = { message: text };
       }
       
-      console.error('API Error Response:', {
-        status: response.status,
-        statusText: response.statusText,
-        url: apiUrl,
-        details: errorData,
-      });
-      
-      // Check for IP restriction error
       if (response.status === 403 && errorData?.reason === 'accessDenied.invalidIp') {
         throw new Error(
           'IP Restriction Error: Your Clash Royale API key has IP restrictions enabled. ' +
@@ -128,31 +120,17 @@ export const generateGameBoard = async (): Promise<Card[]> => {
 
     const data: ApiResponse = await response.json();
     
-    // Debug: log the response structure to help troubleshoot
-    console.log('Clash Royale API response:', data);
-    console.log('Number of items:', data.items?.length || 0);
-    console.log('Number of supportItems:', data.supportItems?.length || 0);
-    
-    // Combine items and supportItems
     const allCards = [...(data.items || []), ...(data.supportItems || [])];
-    
-    console.log('Total cards available:', allCards.length);
     
     if (allCards.length === 0) {
       throw new Error("No cards returned from API");
     }
 
-    // Select 16 random cards from all available cards
     const selectedCards = shuffleAndSelect(allCards, 16);
-    console.log('Selected 16 random cards:', selectedCards.map(c => c.name));
-    
-    // Convert to our Card format
     const cards = selectedCards.map(convertApiCard);
 
     return cards;
   } catch (error) {
-    console.error("Failed to fetch cards from Clash Royale API:", error);
-    console.error("Error details:", error);
     
     // Fallback: Use Clash Royale cards with accurate stats
     const fallbackCardNames = [
