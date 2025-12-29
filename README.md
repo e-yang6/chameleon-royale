@@ -1,4 +1,4 @@
-# Chameleon Royale 🦎
+# Chameleon Royale
 
 A party game where you try to catch the Chameleon hiding among Clash Royale cards.
 
@@ -11,7 +11,7 @@ Social deduction game for 3+ players. One person is the **Chameleon** (doesn't k
 ## How to play
 
 1. Add at least 3 players
-2. Pick your mode (Classic or Impostor)
+2. Pick your mode (Classic or In The Dark)
 3. Everyone sees their role and the secret card (if you're a Citizen)
 4. Go around the circle - each person says ONE word related to the secret card
 5. Discuss and figure out who's the Chameleon
@@ -22,7 +22,7 @@ Social deduction game for 3+ players. One person is the **Chameleon** (doesn't k
 
 **Classic**: Chameleon knows they're the impostor and has to blend in without knowing the card.
 
-**Impostor**: Chameleon gets a fake card and doesn't know they're the Chameleon.
+**In The Dark**: Chameleon gets a fake card and doesn't know they're the Chameleon.
 
 ## Tips
 

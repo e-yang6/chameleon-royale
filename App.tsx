@@ -64,7 +64,7 @@ function App() {
       isChameleon: idx === chameleonIndex
     }));
 
-    // In impostor mode, give chameleon a different card from the board
+    // In "In The Dark" mode, give chameleon a different card from the board
     let chameleonCard: Card | null = null;
     if (gameMode === 'impostor') {
       const nonSecretCards = cards.filter(c => c.name !== secret.name);
@@ -104,8 +104,7 @@ function App() {
     }
   };
 
-  const handleVoteEnd = (chameleonCaught: boolean) => {
-    setWinner(chameleonCaught ? 'Citizens' : 'Chameleon');
+  const revealChameleon = () => {
     setGameState(prev => ({ ...prev, phase: 'GAME_OVER' }));
   };
 
@@ -195,8 +194,8 @@ function App() {
                   className="w-5 h-5 sm:w-4 sm:h-4 text-blue-400 bg-slate-700 border-slate-600 focus:ring-2 focus:ring-blue-400 flex-shrink-0"
                 />
                 <div className="flex-1">
-                  <div className="text-sm sm:text-base font-medium text-white">Impostor</div>
-                  <div className="text-xs sm:text-sm text-slate-400">Impostor gets a fake card and doesn't know</div>
+                  <div className="text-sm sm:text-base font-medium text-white">In The Dark</div>
+                  <div className="text-xs sm:text-sm text-slate-400">Chameleon gets a fake card and doesn't know</div>
                 </div>
               </label>
             </div>
@@ -272,7 +271,7 @@ function App() {
     const isChameleon = player.isChameleon;
     const isImpostorMode = gameState.gameMode === 'impostor';
     
-    // In impostor mode, chameleon sees a fake card and doesn't know they're the chameleon
+    // In "In The Dark" mode, chameleon sees a fake card and doesn't know they're the chameleon
     const cardToShow = isChameleon && isImpostorMode && gameState.chameleonCard 
       ? gameState.chameleonCard 
       : gameState.secretCard;
@@ -367,24 +366,19 @@ function App() {
                 </h2>
             </div>
             
-            <div className="grid gap-3 sm:gap-4">
-                <Button variant="danger" size="lg" onClick={() => handleVoteEnd(true)} className="w-full min-h-[48px] touch-manipulation">
-                    Chameleon Caught
+            <div className="space-y-3">
+                <Button variant="primary" size="lg" onClick={revealChameleon} className="w-full min-h-[48px] touch-manipulation">
+                    Reveal Chameleon
                 </Button>
-                <Button variant="secondary" size="lg" onClick={() => handleVoteEnd(false)} className="w-full min-h-[48px] touch-manipulation">
-                    Chameleon Escaped
-                </Button>
+                <button onClick={() => setGameState(prev => ({...prev, phase: 'PLAYING'}))} className="text-slate-500 hover:text-slate-400 text-sm sm:text-base transition-colors py-2 touch-manipulation">
+                    Back to board
+                </button>
             </div>
-
-            <button onClick={() => setGameState(prev => ({...prev, phase: 'PLAYING'}))} className="text-slate-500 hover:text-slate-400 text-sm sm:text-base transition-colors py-2 touch-manipulation">
-                Back to board
-            </button>
         </div>
     </div>
   );
 
   const renderGameOver = () => {
-    const isCitizenWin = winner === 'Citizens';
     const chameleon = gameState.players.find(p => p.isChameleon);
 
     return (
@@ -392,10 +386,10 @@ function App() {
          <div className="max-w-3xl w-full space-y-6 sm:space-y-10">
             <div className="space-y-3 sm:space-y-4">
                 <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
-                    {isCitizenWin ? 'Citizens Win' : 'Chameleon Wins'}
+                    The Chameleon was
                 </h1>
-                <p className="text-base sm:text-lg text-zinc-400 px-2">
-                    The Chameleon was <span className="text-white font-medium border-b border-zinc-700 pb-0.5">{chameleon?.name}</span>
+                <p className="text-2xl sm:text-3xl font-bold text-white px-2">
+                    {chameleon?.name}
                 </p>
             </div>
 

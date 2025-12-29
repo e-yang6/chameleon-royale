@@ -33,5 +33,5 @@ export interface GameState {
   starterPlayerId: string;
   gameMode?: GameMode;
   hideBoard?: boolean;
-  chameleonCard?: Card | null; // For impostor mode - the fake card shown to chameleon
+  chameleonCard?: Card | null; // For "In The Dark" mode - the fake card shown to chameleon
 }
