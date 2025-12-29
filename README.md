@@ -1,4 +1,4 @@
-# Chameleon Royale 🦎
+# Chameleon Royale
 
 A party game where you try to catch the Chameleon hiding among Clash Royale cards.
 
