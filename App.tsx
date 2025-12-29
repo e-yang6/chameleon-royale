@@ -355,11 +355,16 @@ function App() {
   };
 
   const renderVoting = () => (
-    <div className="flex flex-col items-center justify-center h-screen p-4 sm:p-6 bg-zinc-950">
-        <div className="max-w-md w-full space-y-8 sm:space-y-12 text-center">
-            <div className="space-y-3 sm:space-y-4">
-                <h2 className="text-2xl sm:text-3xl font-bold text-white">Who is the Chameleon?</h2>
-                <p className="text-zinc-500 text-sm sm:text-base px-2">Discuss, point fingers, and cast your votes.</p>
+    <div className="flex flex-col items-center justify-center h-screen p-4 sm:p-6 bg-black">
+        <div className="max-w-md w-full space-y-10 sm:space-y-14 text-center">
+            <div className="space-y-4">
+                <div className="text-5xl sm:text-6xl opacity-30">🦎</div>
+                <h2 className="text-3xl sm:text-4xl font-light text-white tracking-wide">
+                    Who is the
+                </h2>
+                <h2 className="text-4xl sm:text-5xl font-bold text-white tracking-wide">
+                    Chameleon?
+                </h2>
             </div>
             
             <div className="grid gap-3 sm:gap-4">
@@ -371,7 +376,7 @@ function App() {
                 </Button>
             </div>
 
-            <button onClick={() => setGameState(prev => ({...prev, phase: 'PLAYING'}))} className="text-zinc-600 hover:text-white text-sm sm:text-base transition-colors py-2 touch-manipulation">
+            <button onClick={() => setGameState(prev => ({...prev, phase: 'PLAYING'}))} className="text-slate-500 hover:text-slate-400 text-sm sm:text-base transition-colors py-2 touch-manipulation">
                 Back to board
             </button>
         </div>
