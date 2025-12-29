@@ -24,10 +24,13 @@ export default async function handler(
     const cleanPath = pathString.startsWith('/') ? pathString : `/${pathString}`;
     const apiUrl = `${baseUrl}${cleanPath}`;
     
+    console.log('Proxy request:', { pathString, cleanPath, apiUrl: apiUrl.replace(apiToken, '***') });
+    
     const response = await fetch(apiUrl, {
       method: req.method || 'GET',
       headers: {
         'Authorization': `Bearer ${apiToken}`,
+        'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
     });
@@ -35,11 +38,26 @@ export default async function handler(
     // Read the response body as text first (can only be read once)
     const responseText = await response.text();
     
+    // Check if response is YAML (Swagger docs) - this means we hit the wrong endpoint
+    if (responseText.trim().startsWith('swagger:') || responseText.trim().startsWith('openapi:')) {
+      console.error('Received YAML/Swagger documentation instead of JSON:', {
+        url: apiUrl,
+        pathString,
+        responsePreview: responseText.substring(0, 200)
+      });
+      return res.status(500).json({ 
+        error: 'API returned documentation instead of data', 
+        message: 'The endpoint may be incorrect or the proxy service is returning Swagger docs',
+        url: apiUrl,
+        status: response.status
+      });
+    }
+    
     let data;
     try {
       data = JSON.parse(responseText);
     } catch (parseError) {
-      console.error('Failed to parse response as JSON:', responseText);
+      console.error('Failed to parse response as JSON:', responseText.substring(0, 500));
       return res.status(500).json({ 
         error: 'Invalid response from API', 
         status: response.status,
