@@ -32,17 +32,19 @@ export default async function handler(
       },
     });
     
+    // Read the response body as text first (can only be read once)
+    const responseText = await response.text();
+    
     let data;
     try {
-      data = await response.json();
+      data = JSON.parse(responseText);
     } catch (parseError) {
-      const text = await response.text();
-      console.error('Failed to parse response as JSON:', text);
+      console.error('Failed to parse response as JSON:', responseText);
       return res.status(500).json({ 
         error: 'Invalid response from API', 
         status: response.status,
         statusText: response.statusText,
-        body: text.substring(0, 500) // First 500 chars
+        body: responseText.substring(0, 500) // First 500 chars
       });
     }
     
