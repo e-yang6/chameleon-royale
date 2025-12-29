@@ -301,6 +301,7 @@ function App() {
                     src={cardToShow.imageUrl} 
                     alt={cardToShow.name}
                     className="w-24 h-32 sm:w-32 sm:h-40 object-contain mx-auto mb-3 sm:mb-4"
+                    draggable={false}
                     onError={(e) => {
                       // Hide image on error
                       (e.target as HTMLImageElement).style.display = 'none';
@@ -408,6 +409,7 @@ function App() {
                             src={gameState.secretCard.imageUrl} 
                             alt={gameState.secretCard.name}
                             className="w-24 h-32 sm:w-32 sm:h-40 object-contain mb-3 sm:mb-4"
+                            draggable={false}
                             onError={(e) => {
                               // Hide image on error
                               (e.target as HTMLImageElement).style.display = 'none';

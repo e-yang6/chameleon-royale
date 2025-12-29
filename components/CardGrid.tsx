@@ -49,6 +49,7 @@ export const CardGrid: React.FC<CardGridProps> = ({ cards, secretCard, revealSec
                   src={card.imageUrl} 
                   alt={card.name}
                   className="w-full h-full object-cover"
+                  draggable={false}
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = 'none';
                   }}
@@ -70,6 +71,7 @@ export const CardGrid: React.FC<CardGridProps> = ({ cards, secretCard, revealSec
                       src={card.imageUrl} 
                       alt={card.name}
                       className="w-full h-full object-contain"
+                      draggable={false}
                       onError={(e) => {
                         (e.target as HTMLImageElement).style.display = 'none';
                       }}
