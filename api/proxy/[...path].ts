@@ -19,7 +19,7 @@ export default async function handler(
   
   try {
     // Construct URL using WHATWG URL API to avoid deprecation warnings
-    const baseUrl = 'https://api.clashroyale.com/v1';
+    const baseUrl = 'https://proxy.royaleapi.dev/v1';
     // Ensure path starts with / and construct full URL
     const cleanPath = pathString.startsWith('/') ? pathString : `/${pathString}`;
     const apiUrl = `${baseUrl}${cleanPath}`;

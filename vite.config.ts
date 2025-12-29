@@ -13,7 +13,7 @@ export default defineConfig(({ mode }) => {
         host: '0.0.0.0',
         proxy: {
           '/api/clashroyale': {
-            target: 'https://api.clashroyale.com',
+            target: 'https://proxy.royaleapi.dev',
             changeOrigin: true,
             rewrite: (path) => path.replace(/^\/api\/clashroyale/, '/v1'),
             configure: (proxy, _options) => {

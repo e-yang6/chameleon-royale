@@ -1,7 +1,7 @@
 import { Card } from "../types";
 
 // Clash Royale API configuration
-const API_BASE_URL = "https://api.clashroyale.com/v1";
+const API_BASE_URL = "https://proxy.royaleapi.dev/v1";
 // Note: In development, we use a proxy (configured in vite.config.ts) which adds the auth token server-side
 // The token should NOT be exposed in client-side code for security
 

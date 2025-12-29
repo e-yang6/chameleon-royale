@@ -13,7 +13,7 @@ export const handler: Handler = async (event) => {
   }
   
   try {
-    const apiUrl = `https://api.clashroyale.com/v1${path}`;
+    const apiUrl = `https://proxy.royaleapi.dev/v1${path}`;
     
     const response = await fetch(apiUrl, {
       method: event.httpMethod || 'GET',
@@ -37,6 +37,7 @@ export const handler: Handler = async (event) => {
     };
   }
 };
+
 
 
 
