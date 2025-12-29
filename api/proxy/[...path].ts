@@ -22,13 +22,12 @@ export default async function handler(
     const baseUrl = 'https://proxy.royaleapi.dev/v1';
     // Ensure path starts with / and construct full URL
     const cleanPath = pathString.startsWith('/') ? pathString : `/${pathString}`;
-    
-    // Try with API key as query parameter (proxy.royaleapi.dev may expect this format)
-    const apiUrl = `${baseUrl}${cleanPath}?key=${encodeURIComponent(apiToken)}`;
+    const apiUrl = `${baseUrl}${cleanPath}`;
     
     const response = await fetch(apiUrl, {
       method: req.method || 'GET',
       headers: {
+        'Authorization': `Bearer ${apiToken}`,
         'Content-Type': 'application/json',
       },
     });
