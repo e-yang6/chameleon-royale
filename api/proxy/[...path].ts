@@ -1,14 +1,9 @@
-// Vercel serverless function to proxy Clash Royale API requests
-// This keeps the API token secure on the server
-
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse
 ) {
-  // Extract path from query params (catch-all route)
-  // With [...path].ts, Vercel creates a query param named '...path' (with dots)
   const pathParam = req.query['...path'] || req.query.path;
   
   let pathString = '';

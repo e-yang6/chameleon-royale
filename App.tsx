@@ -17,12 +17,9 @@ function App() {
 
   const [playerName, setPlayerName] = useState('');
   const [showRules, setShowRules] = useState(false);
-  const [winner, setWinner] = useState<'Citizens' | 'Chameleon' | null>(null);
   const [gameMode, setGameMode] = useState<'classic' | 'impostor'>('classic');
   const [hideBoard, setHideBoard] = useState(false);
   const [boardReviewExpanded, setBoardReviewExpanded] = useState(false);
-
-  // --- Actions ---
 
   const addPlayer = () => {
     if (!playerName.trim()) return;
@@ -56,8 +53,6 @@ function App() {
 
     const cards = await generateGameBoard();
     const secret = cards[Math.floor(Math.random() * cards.length)];
-    
-    // Assign Chameleon randomly
     const chameleonIndex = Math.floor(Math.random() * gameState.players.length);
     
     const updatedPlayers = gameState.players.map((p, idx) => ({
@@ -65,14 +60,12 @@ function App() {
       isChameleon: idx === chameleonIndex
     }));
 
-    // In "In The Dark" mode, give chameleon a different card from the board
     let chameleonCard: Card | null = null;
     if (gameMode === 'impostor') {
       const nonSecretCards = cards.filter(c => c.name !== secret.name);
       chameleonCard = nonSecretCards[Math.floor(Math.random() * nonSecretCards.length)];
     }
 
-    // Determine starter
     const starter = updatedPlayers[Math.floor(Math.random() * updatedPlayers.length)];
 
     setGameState(prev => ({
@@ -80,9 +73,9 @@ function App() {
       players: updatedPlayers,
       boardCards: cards,
       secretCard: secret,
-      chameleonCard: chameleonCard,
-      gameMode: gameMode,
-      hideBoard: hideBoard,
+      chameleonCard,
+      gameMode,
+      hideBoard,
       currentPlayerIndex: 0,
       phase: 'REVEAL_INTERSTITIAL',
       starterPlayerId: starter.id
@@ -116,10 +109,8 @@ function App() {
       boardCards: [],
       secretCard: null,
       chameleonCard: null,
-      currentPlayerIndex: 0,
-      winner: null
+      currentPlayerIndex: 0
     }));
-    setWinner(null);
     setBoardReviewExpanded(false);
   };
   
@@ -127,8 +118,6 @@ function App() {
      if (gameState.players.length < 3) return;
      await startGame();
   }
-
-  // --- Renders ---
 
   const renderSetup = () => (
     <div className="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 max-w-lg mx-auto w-full">
@@ -270,14 +259,11 @@ function App() {
 
   const renderRevealInfo = () => {
     const player = gameState.players[gameState.currentPlayerIndex];
-    const isChameleon = player.isChameleon;
     const isImpostorMode = gameState.gameMode === 'impostor';
-    
-    // In "In The Dark" mode, chameleon sees a fake card and doesn't know they're the chameleon
-    const cardToShow = isChameleon && isImpostorMode && gameState.chameleonCard 
+    const cardToShow = player.isChameleon && isImpostorMode && gameState.chameleonCard 
       ? gameState.chameleonCard 
       : gameState.secretCard;
-    const showAsChameleon = isChameleon && !isImpostorMode; // Only show chameleon status in classic mode
+    const showAsChameleon = player.isChameleon && !isImpostorMode;
 
     return (
       <div className="flex flex-col items-center justify-center h-screen p-4 sm:p-6 bg-slate-900">
@@ -303,7 +289,6 @@ function App() {
                     className="w-24 h-32 sm:w-32 sm:h-40 object-contain mx-auto mb-3 sm:mb-4"
                     draggable={false}
                     onError={(e) => {
-                      // Hide image on error
                       (e.target as HTMLImageElement).style.display = 'none';
                     }}
                   />

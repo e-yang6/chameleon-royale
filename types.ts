@@ -25,7 +25,7 @@ export type GameMode = 'classic' | 'impostor';
 
 export interface GameState {
   players: Player[];
-  currentPlayerIndex: number; // For reveal phase
+  currentPlayerIndex: number;
   boardCards: Card[];
   secretCard: Card | null;
   phase: GamePhase;
@@ -33,5 +33,5 @@ export interface GameState {
   starterPlayerId: string;
   gameMode?: GameMode;
   hideBoard?: boolean;
-  chameleonCard?: Card | null; // For "In The Dark" mode - the fake card shown to chameleon
+  chameleonCard?: Card | null;
 }

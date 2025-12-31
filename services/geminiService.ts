@@ -1,11 +1,5 @@
 import { Card } from "../types";
 
-// Clash Royale API configuration
-const API_BASE_URL = "https://proxy.royaleapi.dev/v1";
-// Note: In development, we use a proxy (configured in vite.config.ts) which adds the auth token server-side
-// The token should NOT be exposed in client-side code for security
-
-// API response types - structure may vary, we'll handle flexibility
 interface ApiCard {
   name: string;
   id?: number;
@@ -25,7 +19,6 @@ interface ApiResponse {
   supportItems?: ApiCard[];
 }
 
-// Map API rarity to our Card rarity type
 const mapRarity = (apiRarity?: string): Card['rarity'] => {
   if (!apiRarity) return 'Common';
   const rarityMap: Record<string, Card['rarity']> = {
@@ -38,17 +31,12 @@ const mapRarity = (apiRarity?: string): Card['rarity'] => {
   return rarityMap[apiRarity.toLowerCase()] || 'Common';
 };
 
-// Generate image URL from card name (fallback)
 const getCardImageUrl = (cardName: string): string => {
-  // Clash Royale card image URLs format
-  // Using royaleapi.com CDN as fallback - they have card images
   const formattedName = cardName.replace(/\s+/g, '-').replace(/\./g, '').toLowerCase();
   return `https://royaleapi.github.io/cr-api-data/img/cards-150/${formattedName}.png`;
 };
 
-// Convert API card to our Card interface
 const convertApiCard = (apiCard: ApiCard): Card => {
-  // Try multiple possible property names for rarity and elixir
   const rarity = apiCard.rarity || apiCard.rarityName;
   const elixir = apiCard.elixirCost || apiCard.elixir || apiCard.elixirElixir || 0;
   const imageUrl = apiCard.iconUrls?.medium || getCardImageUrl(apiCard.name);
@@ -56,12 +44,11 @@ const convertApiCard = (apiCard: ApiCard): Card => {
   return {
     name: apiCard.name,
     rarity: mapRarity(rarity),
-    elixir: elixir,
-    imageUrl: imageUrl,
+    elixir,
+    imageUrl,
   };
 };
 
-// Better shuffle algorithm (Fisher-Yates)
 const shuffle = <T>(array: T[]): T[] => {
   const shuffled = [...array];
   for (let i = shuffled.length - 1; i > 0; i--) {
@@ -71,7 +58,6 @@ const shuffle = <T>(array: T[]): T[] => {
   return shuffled;
 };
 
-// Shuffle array and select random items
 const shuffleAndSelect = <T>(array: T[], count: number): T[] => {
   const shuffled = shuffle(array);
   return shuffled.slice(0, count);
@@ -79,25 +65,16 @@ const shuffleAndSelect = <T>(array: T[], count: number): T[] => {
 
 export const generateGameBoard = async (): Promise<Card[]> => {
   try {
-    // Always use proxy route - configure proxy in your deployment platform
-    // For Vite dev: configured in vite.config.ts
-    // For production: use Vercel rewrites, Netlify redirects, or similar
     const apiUrl = '/api/clashroyale/cards';
-    
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-    };
-    
-    // Proxy adds auth header server-side
-    // Never expose API tokens in client-side code!
     
     const response = await fetch(apiUrl, {
       method: 'GET',
-      headers,
+      headers: {
+        'Content-Type': 'application/json',
+      },
     });
 
     if (!response.ok) {
-      // Try to get error details from response
       let errorData: any = null;
       try {
         errorData = await response.json();
@@ -131,8 +108,6 @@ export const generateGameBoard = async (): Promise<Card[]> => {
 
     return cards;
   } catch (error) {
-    
-    // Fallback: Use Clash Royale cards with accurate stats
     const fallbackCardNames = [
       "Archer Queen", "Bandit", "Barbarians", "Dart Goblin", "Electro Giant",
       "Elixir Collector", "Executioner", "Goblins", "Goblin Machine", "Golden Knight",
@@ -172,7 +147,6 @@ export const generateGameBoard = async (): Promise<Card[]> => {
       imageUrl: getCardImageUrl(name),
     }));
     
-    // Randomly select 16 from the fallback pool
     return shuffleAndSelect(fallbackCards, 16);
   }
 };
