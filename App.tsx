@@ -20,6 +20,7 @@ function App() {
   const [winner, setWinner] = useState<'Citizens' | 'Chameleon' | null>(null);
   const [gameMode, setGameMode] = useState<'classic' | 'impostor'>('classic');
   const [hideBoard, setHideBoard] = useState(false);
+  const [boardReviewExpanded, setBoardReviewExpanded] = useState(false);
 
   // --- Actions ---
 
@@ -119,6 +120,7 @@ function App() {
       winner: null
     }));
     setWinner(null);
+    setBoardReviewExpanded(false);
   };
   
   const playAgainSamePlayers = async () => {
@@ -341,7 +343,6 @@ function App() {
           <div className="flex-1 flex items-center justify-center p-4 sm:p-6">
             <div className="text-center space-y-3 sm:space-y-4">
               <p className="text-zinc-500 text-base sm:text-lg">Board is hidden</p>
-              <p className="text-zinc-600 text-sm sm:text-base">Discuss and give hints without seeing the cards</p>
             </div>
           </div>
         ) : (
@@ -416,7 +417,16 @@ function App() {
             </div>
 
             <div className="space-y-3 sm:space-y-4">
-               <h3 className="text-xs text-zinc-500 uppercase tracking-widest">Board Review</h3>
+               <div className="flex items-center justify-between">
+                 <h3 className="text-xs text-zinc-500 uppercase tracking-widest">Board Review</h3>
+                 <button 
+                   onClick={() => setBoardReviewExpanded(true)}
+                   className="text-lg text-zinc-400 hover:text-zinc-300 transition-colors touch-manipulation"
+                   title="Enlarge"
+                 >
+                   ⛶
+                 </button>
+               </div>
                <div className="h-48 sm:h-64 overflow-y-auto rounded-xl border border-slate-700 bg-slate-800/50 p-2">
                  <CardGrid cards={gameState.boardCards} secretCard={gameState.secretCard} revealSecret={true} />
                </div>
@@ -449,6 +459,20 @@ function App() {
     </div>
   );
 
+  const BoardReviewModal = () => (
+    <div className="fixed inset-0 bg-slate-900/95 backdrop-blur-sm flex items-center justify-center z-50 p-4 sm:p-6" onClick={() => setBoardReviewExpanded(false)}>
+      <div className="bg-slate-800 rounded-2xl w-full max-w-6xl max-h-[90vh] border border-slate-700 relative flex flex-col" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-slate-700">
+          <h2 className="text-lg sm:text-xl font-bold text-white">Board Review</h2>
+          <button onClick={() => setBoardReviewExpanded(false)} className="text-zinc-500 hover:text-white transition-colors text-2xl w-8 h-8 flex items-center justify-center touch-manipulation">✕</button>
+        </div>
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
+          <CardGrid cards={gameState.boardCards} secretCard={gameState.secretCard} revealSecret={true} />
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen bg-slate-900 text-zinc-100 font-sans selection:bg-purple-500/30 selection:text-white">
       {gameState.phase === 'SETUP' && renderSetup()}
@@ -460,6 +484,7 @@ function App() {
       {gameState.phase === 'GAME_OVER' && renderGameOver()}
       
       {showRules && <RulesModal />}
+      {boardReviewExpanded && <BoardReviewModal />}
     </div>
   );
 }
