@@ -123,7 +123,7 @@ function App() {
     <div className="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 max-w-lg mx-auto w-full">
       <div className="w-full space-y-6 sm:space-y-8">
         <div className="text-center space-y-2 sm:space-y-3">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl text-white font-bold tracking-wide">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl text-white font-bold tracking-wide clash-title">
             Chameleon Royale
           </h1>
         </div>
@@ -239,7 +239,7 @@ function App() {
   const renderRevealInterstitial = () => {
     const player = gameState.players[gameState.currentPlayerIndex];
     return (
-      <div className="flex flex-col items-center justify-center h-screen p-4 sm:p-6 bg-slate-900">
+      <div className="flex flex-col items-center justify-center h-screen p-4 sm:p-6">
         <div className="max-w-md w-full text-center space-y-8 sm:space-y-12">
           <div>
              <h2 className="text-zinc-500 uppercase tracking-widest text-xs mb-2">Next Player</h2>
@@ -266,7 +266,7 @@ function App() {
     const showAsChameleon = player.isChameleon && !isImpostorMode;
 
     return (
-      <div className="flex flex-col items-center justify-center h-screen p-4 sm:p-6 bg-slate-900">
+      <div className="flex flex-col items-center justify-center h-screen p-4 sm:p-6">
         <div className={`max-w-md w-full text-center p-6 sm:p-10 rounded-2xl border transition-colors duration-500 ${showAsChameleon ? 'border-red-500/30 bg-red-500/10' : 'border-green-500/30 bg-green-500/10'}`}>
           
           <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6 sm:mb-8">Your Identity</h2>
@@ -310,7 +310,7 @@ function App() {
     const starter = gameState.players.find(p => p.id === gameState.starterPlayerId);
     
     return (
-      <div className="flex flex-col h-screen overflow-hidden bg-slate-900">
+      <div className="flex flex-col h-screen overflow-hidden">
         <div className="flex-none px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-700 flex justify-between items-center z-10 bg-slate-900/80 backdrop-blur-sm gap-3">
              <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                 <div className="flex flex-col min-w-0">
@@ -368,7 +368,7 @@ function App() {
     const chameleon = gameState.players.find(p => p.isChameleon);
 
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 bg-slate-900 text-center">
+      <div className="flex flex-col items-center justify-center min-h-screen p-4 sm:p-6 text-center">
          <div className="max-w-3xl w-full space-y-6 sm:space-y-10">
             <div className="space-y-3 sm:space-y-4">
                 <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
@@ -419,7 +419,7 @@ function App() {
 
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center pt-4 sm:pt-6">
                 <Button onClick={playAgainSamePlayers} size="lg" className="w-full sm:w-auto min-h-[48px] touch-manipulation">Play Again</Button>
-                <Button onClick={resetGame} variant="secondary" size="lg" className="w-full sm:w-auto min-h-[48px] touch-manipulation">Reset</Button>
+                <Button onClick={resetGame} variant="secondary" size="lg" className="w-full sm:w-auto min-h-[48px] touch-manipulation">Menu</Button>
             </div>
          </div>
       </div>
@@ -459,7 +459,7 @@ function App() {
   );
 
   return (
-    <div className="min-h-screen bg-slate-900 text-zinc-100 font-sans selection:bg-purple-500/30 selection:text-white">
+    <div className="min-h-screen diamond-background text-zinc-100 font-sans selection:bg-purple-500/30 selection:text-white">
       {gameState.phase === 'SETUP' && renderSetup()}
       {gameState.phase === 'LOADING_BOARD' && renderLoading()}
       {gameState.phase === 'REVEAL_INTERSTITIAL' && renderRevealInterstitial()}
