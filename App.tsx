@@ -269,7 +269,9 @@ function App() {
       <div className="flex flex-col items-center justify-center h-screen p-4 sm:p-6">
         <div className={`max-w-md w-full text-center p-6 sm:p-10 rounded-2xl border transition-colors duration-500 ${showAsChameleon ? 'border-red-500/30 bg-red-500/10' : 'border-green-500/30 bg-green-500/10'}`}>
           
-          <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6 sm:mb-8">Your Identity</h2>
+          {!isImpostorMode && (
+            <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6 sm:mb-8">Your Identity</h2>
+          )}
           
           {isImpostorMode ? (
             <div className="mb-8 sm:mb-12 space-y-4 sm:space-y-6">
