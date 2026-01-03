@@ -271,7 +271,25 @@ function App() {
           
           <h2 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6 sm:mb-8">Your Identity</h2>
           
-          {showAsChameleon ? (
+          {isImpostorMode ? (
+            <div className="mb-8 sm:mb-12 space-y-4 sm:space-y-6">
+              <div className="bg-slate-800 border border-slate-700 p-4 sm:p-6 rounded-xl">
+                <p className="text-[10px] text-zinc-500 uppercase tracking-widest mb-3 sm:mb-4">Secret Card</p>
+                {cardToShow?.imageUrl && (
+                  <img 
+                    src={cardToShow.imageUrl} 
+                    alt={cardToShow.name}
+                    className="w-24 h-32 sm:w-32 sm:h-40 object-contain mx-auto mb-3 sm:mb-4"
+                    draggable={false}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                )}
+                <p className="text-xl sm:text-2xl font-bold text-white">{cardToShow?.name}</p>
+              </div>
+            </div>
+          ) : showAsChameleon ? (
             <div className="mb-8 sm:mb-12 space-y-3 sm:space-y-4">
               <div className="text-5xl sm:text-6xl">🦎</div>
               <h1 className="text-2xl sm:text-3xl font-bold text-red-500">Chameleon</h1>
@@ -311,7 +329,7 @@ function App() {
     
     return (
       <div className="flex flex-col h-screen overflow-hidden">
-        <div className="flex-none px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-700 flex justify-between items-center z-10 bg-slate-900/80 backdrop-blur-sm gap-3">
+        <div className="sticky top-0 flex-none px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-700 flex justify-between items-center z-10 bg-slate-900/80 backdrop-blur-sm gap-3">
              <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                 <div className="flex flex-col min-w-0">
                     <span className="text-[10px] text-zinc-500 uppercase tracking-wider">First Turn</span>
