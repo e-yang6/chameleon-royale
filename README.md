@@ -4,6 +4,13 @@ A party game where you try to catch the Chameleon hiding among Clash Royale card
 
 **Play it here:** [chameleon-royale.vercel.app](https://chameleon-royale.vercel.app)
 
+<div align="center">
+  
+### Please ⭐ this repository if you use it!
+![Stars](https://img.shields.io/github/stars/e-yang6/chameleon-royale)
+
+</div>
+
 ## What's this?
 
 Social deduction game for 3+ players. One person is the **Chameleon** (doesn't know the secret card), everyone else are **Citizens** (they know it). Citizens try to find the Chameleon, Chameleon tries to blend in or guess the card.
